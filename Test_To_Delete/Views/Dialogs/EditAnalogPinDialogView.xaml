@@ -1,0 +1,25 @@
+﻿<Window x:Class="LAB.Views.EditAnalogPinDialogView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ignore="http://www.galasoft.ch/ignore"
+        mc:Ignorable="d ignore"
+        Title="Analog Pin Configuration"
+        WindowStartupLocation="CenterScreen"
+        DataContext="{Binding HardwareSetup, Source={StaticResource Locator}}" Background="{DynamicResource WindowBackground}" Foreground="{DynamicResource Principal_Forground}" Height="161.009" Width="165.415">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LAB_V2;component/Skins/MainSkin.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Label Content="Select an analog pin" HorizontalAlignment="Center" Foreground="{DynamicResource Principal_Forground}"/>
+        <ComboBox ItemsSource="{Binding Path=AnalogPins}" SelectedItem="{Binding Path=SelectedPin, Mode=TwoWay}" HorizontalContentAlignment="Left" HorizontalAlignment="Center" Width="100" Margin="10"/>
+        <Button Content="Confirm" Width="100" Margin="20" Command="{Binding Path=ConfirmPinSelectedCommand}"/>
+    </StackPanel>
+</Window>

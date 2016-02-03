@@ -1,0 +1,156 @@
+﻿<Window xmlns:Views="clr-namespace:LAB.Views"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:cmd="http://www.galasoft.ch/mvvmlight"
+        xmlns:ignore="http://www.galasoft.ch/ignore"
+        xmlns:local="clr-namespace:LAB"  x:Class="LAB.MainWindow"
+        mc:Ignorable="d ignore"
+        Height="900"
+        VerticalAlignment="Stretch"
+        Width="1600"
+        Title="Lowis Automated Brewery"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Background="{DynamicResource WindowBackground}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Skins/MainSkin.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <Binding Path="Main" Source="{StaticResource Locator}"/>
+    </Window.DataContext>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <cmd:EventToCommand Command="{Binding MainClosingCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <DockPanel x:Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+        <Menu DockPanel.Dock="Top" ToolBarTray.IsLocked="True" Height="22" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="{DynamicResource MenuBackground}" Foreground="#FFD7D7D7" >
+
+            <Menu.Resources>
+                <Style TargetType="{x:Type MenuItem}">
+                    <Setter Property="Background" Value="#FF333333"/>
+                    <Setter Property="Foreground" Value="#FFD7D7D7"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="VerticalAlignment" Value="Stretch"/>
+                </Style>
+            </Menu.Resources>
+
+            <MenuItem Header="_File" Template="{DynamicResource MenuItem_LABSTYLE}" Height="22">
+                <MenuItem Header="Load Recipe" Template="{DynamicResource MenuSubItem_LABSTYLE}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <cmd:EventToCommand Command="{Binding LoadRecipeClickCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+            </MenuItem>
+
+            <MenuItem Header="_Edit" Template="{DynamicResource MenuItem_LABSTYLE}"/>
+            <MenuItem Header="_Brew" Template="{DynamicResource MenuItem_LABSTYLE}">
+                <MenuItem Header="{Binding StartSessionButtonContent}" Template="{DynamicResource MenuSubItem_LABSTYLE}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <cmd:EventToCommand Command="{Binding StartBrewSessionClickCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="Debug Design Session" Template="{DynamicResource MenuSubItem_LABSTYLE}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <cmd:EventToCommand Command="{Binding DebugDesignSessionClickCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+            </MenuItem>
+
+            <MenuItem Header="_Settings" Template="{DynamicResource MenuItem_LABSTYLE}">
+                <MenuItem Header="Automation Mode" Template="{DynamicResource MenuSubItem_LABSTYLE}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Hover">
+                            <cmd:EventToCommand Command=""/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="Connection Setup" Template="{DynamicResource MenuSubItem_LABSTYLE}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <cmd:EventToCommand Command="{Binding ConnectionSetupClickCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="Hardware Setup" Template="{DynamicResource MenuSubItem_LABSTYLE}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <cmd:EventToCommand Command="{Binding HardwareSetupClickCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="Recipe Setup" Template="{DynamicResource MenuSubItem_LABSTYLE}"/>
+            </MenuItem>
+        </Menu>
+
+
+        <DockPanel DockPanel.Dock="Bottom" Height="25" VerticalAlignment="Stretch" LastChildFill="True" Background="#FF333333">
+            <Label Content="{Binding BreweryStateDisplay}" DockPanel.Dock="Left" Foreground="{DynamicResource Non-Critical_Foreground}"/>
+            <Label Content="{Binding ConnectionStatus}" DockPanel.Dock="Right" HorizontalAlignment="Right" Width="Auto" Foreground="#FF7F7F7F"/>
+        </DockPanel>
+
+
+        <Grid DockPanel.Dock="Left" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="421*"/>
+                <RowDefinition Height="100*"/>
+                <RowDefinition Height="204*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10*"/>
+                <ColumnDefinition Width="70*"/>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="70*"/>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="70*"/>
+                <ColumnDefinition Width="10*"/>
+                <ColumnDefinition Width="70*"/>
+            </Grid.ColumnDefinitions>
+            <Views:HLTView Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="4.8,0"  />
+            <Views:MLTView Grid.Column="3" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="5,0,4.6,0"/>
+            <Views:BKView Grid.Column="5" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="5,0,4.6,0"/>
+            <Views:Pump1View Grid.Column="2" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65" />
+            <Views:Pump2View Grid.Column="4" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65" />
+            <Views:UserActionView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+
+            <GridSplitter Grid.Column="8" Width="5" Height="auto" HorizontalAlignment="Left" VerticalAlignment="Stretch" ResizeDirection="Columns" Grid.RowSpan="3"/>
+            <DockPanel x:Name="SidePanelContainer" Grid.Column="8" Grid.Row="0" Grid.RowSpan="3" DockPanel.Dock="Right">
+            <local:SidePanelView DockPanel.Dock="Top" 
+                                 Height="auto" 
+                                 BorderThickness="0" 
+                                 Margin="0" 
+                                 Width="{Binding ElementName=SidePanelContainer, Path=ActualWidth}"
+                                 VerticalContentAlignment="Top" 
+                                 VerticalAlignment="Stretch"
+                                 Background="{DynamicResource MenuBackground}"/>
+            
+            <Views:TimerView DockPanel.Dock="Bottom" 
+                             VerticalAlignment="Stretch" 
+                             VerticalContentAlignment="Bottom"
+                             Margin="0" 
+                             Background="{DynamicResource MenuBackground}"/>
+        </DockPanel>
+        </Grid>
+
+    </DockPanel>
+
+
+</Window>

@@ -1,0 +1,28 @@
+﻿<Window x:Class="LAB.Views.EditRefreshRateDialogView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ignore="http://www.galasoft.ch/ignore"
+        mc:Ignorable="d ignore"
+        Title="Refresh Rate Configuration"
+        WindowStartupLocation="CenterScreen"
+        DataContext="{Binding HardwareSetup, Source={StaticResource Locator}}" Background="{DynamicResource WindowBackground}" Foreground="{DynamicResource Principal_Forground}" Height="169.009" Width="165.415">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LAB_V2;component/Skins/MainSkin.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FocusManager.FocusedElement="{Binding ElementName=Input}">
+        <Label Content="Select a refresh rate" HorizontalAlignment="Center" Foreground="{DynamicResource Principal_Forground}"/>
+        <TextBox x:Name="Input" Text="{Binding Path=SelectedRefreshRate}" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Width="100" Margin="10"/>
+        <Label Content="Miliseconds" HorizontalAlignment="Center" Foreground="{DynamicResource Principal_Forground}"/>
+        <Button Content="Confirm" Width="100" Margin="10" Command="{Binding Path=ConfirmPinSelectedCommand}"/>
+    </StackPanel>
+
+</Window>
+

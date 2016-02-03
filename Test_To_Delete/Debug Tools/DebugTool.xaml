@@ -1,0 +1,38 @@
+﻿<Window x:Class="LAB.Debug_Tools.DebugTool"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LAB.Debug_Tools"
+        mc:Ignorable="d"
+        Title="DebugTool" Height="238.775" Width="249.49"
+        Topmost="True"
+        DataContext="{Binding Debug, Source={StaticResource Locator}}">
+    
+    <Grid HorizontalAlignment="Center">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="L" Margin="3,0,0,0"/>
+                <Label Content="°C" Margin="10,0,0,0"/>
+                <Label Content="L" Margin="35,0,0,0"/>
+                <Label Content="°C" Margin="10,0,0,0"/>
+                <Label Content="L" Margin="37,0,0,0"/>
+                <Label Content="°C" Margin="10,0,0,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" >
+                <Slider x:Name="HLTVOL" Value="{Binding Path=HLTVOL, Mode=OneWayToSource}" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Height="155" Maximum="50"/>
+                <Slider x:Name="HLTTEMP" Value="{Binding Path=HLTTEMP, Mode=OneWayToSource}" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Height="155" Margin="10,0,0,0" Maximum="100"/>
+                <Slider x:Name="MLTVOL" Value="{Binding Path=MLTVOL, Mode=OneWayToSource}" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Height="155" Margin="30,0,0,0" Maximum="50"/>
+                <Slider x:Name="MLTTEMP" Value="{Binding Path=MLTTEMP, Mode=OneWayToSource}" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Height="155" Margin="10,0,0,0" Maximum="100"/>
+                <Slider x:Name="BKVOL" Value="{Binding Path=BKVOL, Mode=OneWayToSource}" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Height="155" Margin="30,0,0,0" Maximum="50"/>
+                <Slider x:Name="BKTEMP" Value="{Binding Path=BKTEMP, Mode=OneWayToSource}" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Height="155" Margin="10,0,0,0" Maximum="100"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="HLT" Margin="12,0,0,0"/>
+                <Label Content="MLT" Margin="55,0,0,0"/>
+                <Label Content="BK" Margin="55,0,0,0"/>
+            </StackPanel>
+        </StackPanel>
+
+    </Grid>
+</Window>

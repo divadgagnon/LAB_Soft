@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="LAB.Views.UserActionView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ignore="http://www.galasoft.ch/ignore"
+        mc:Ignorable="d ignore"
+        DataContext="{Binding UserAction, Source={StaticResource Locator}}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LAB_V2;component/Skins/MainSkin.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Rectangle Fill="{DynamicResource Principal_Forground}" Stroke="White" Width="800" Height="180" RadiusX="5" RadiusY="5" StrokeThickness="3" Opacity="0.2"/>
+        <Rectangle Stroke="Red" StrokeThickness="4" Visibility="{Binding UserActionAlarm}" Width="800" Height="180" RadiusX="5" RadiusY="5" Opacity="0.5"/>
+        <StackPanel Orientation="Horizontal">
+            <Rectangle Width="10" VerticalAlignment="Stretch"/>
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Width="630" Text="{Binding DisplayText}" FontWeight="Bold" FontSize="22" Foreground="#FF400505" TextAlignment="Center" TextWrapping="Wrap" />
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Button Content="Hold" Width="100" Margin="30" IsEnabled="{Binding HoldButtonIsEnabled}"/>
+                <Button Content="Proceed" Width="100" Margin="30" IsEnabled="{Binding ProccedButtonIsEnabled}" Command="{Binding ProceedClickCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
