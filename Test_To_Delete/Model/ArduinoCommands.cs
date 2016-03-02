@@ -89,10 +89,10 @@ namespace LAB
         /// <param name="Pin">Pin to set</param>
         /// <param name="Level">Level of the pin (true or false)</param>
 
-        public void DigitalWrite(int Pin, bool Level)
+        public void DigitalWrite(int Pin, RelayState State)
         {
             byte pinByte = Convert.ToByte(Pin);
-            byte LevelByte = Convert.ToByte(Level);
+            byte LevelByte = Convert.ToByte(State);
             device.SendPacketData(new byte[3] {0x04, pinByte, LevelByte});
             StartTimeoutTimer();
         }

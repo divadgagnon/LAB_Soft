@@ -20,6 +20,7 @@ namespace LAB.Model
     public class Style
     {
         public string Name { get; set; }
+        public string Description { get; set; }
     }
 
     public class Process
@@ -47,7 +48,7 @@ namespace LAB.Model
             public bool IsStarted { get; set; }
             public bool StartRequested { get; set; }
             public double TotalWaterNeeded { get; set; }
-            public AutomationMode ControlMode { get; set; }
+            public automationMode ControlMode { get; set; }
         }
 
         public class MashStep
@@ -92,12 +93,14 @@ namespace LAB.Model
     {
         public List<Malt> Malts { get; set; }
         public List<Hop> Hops { get; set; }
+        public List<Malt> Adjuncts { get; set; }
         public yeast Yeast { get; set; }
 
         public Ingredients()
         {
             Malts = new List<Malt>();
             Hops = new List<Hop>();
+            Adjuncts = new List<Malt>();
             Yeast = new yeast();
         }
 
@@ -106,7 +109,7 @@ namespace LAB.Model
             public visibility Visibility { get; }
             public string Name { get; set; }
             public double Quantity { get; set; }
-            public string SRM { get; set; }
+            public double SRM { get; set; }
             public string Units { get; } = "Kg";
         }
 
@@ -250,6 +253,9 @@ namespace LAB.Model
         public vessel BK { get; set; }
         public pump Pump1 { get; set; }
         public pump Pump2 { get; set; }
+        public pump AirPump1 { get; set; }
+        public pump AirPump2 { get; set; }
+        public automationMode AutomationMode { get; set; } = automationMode.Automatic;
 
         public Brewery()
         {
@@ -258,6 +264,9 @@ namespace LAB.Model
             BK = new vessel(Vessels.BK);
             Pump1 = new pump();
             Pump2 = new pump();
+            AirPump1 = new pump();
+            AirPump2 = new pump();
+            AutomationMode = new automationMode();
         }
 
         public class vessel
@@ -346,6 +355,7 @@ namespace LAB.Model
         Boil,
         Chill,
         Fermenter_Transfer,
+        Manual_Override,
     }
 
     public enum PinModes
@@ -354,9 +364,16 @@ namespace LAB.Model
         Input = 0x01,
     }
 
-    public enum AutomationMode
+    public enum RelayState
+    {
+        On = 0x00,
+        Off = 0x01,
+    }
+
+    public enum automationMode
     {
         Automatic,
+        SemiAuto,
         Manual,
     }
 

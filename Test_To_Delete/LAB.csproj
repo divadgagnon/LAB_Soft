@@ -257,6 +257,9 @@
     <Resource Include="Burner Flames.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Data\DefaultHardwareSettings.xml">
+      <SubType>Designer</SubType>
+    </Resource>
     <Content Include="Media\Bleep.mp3" />
     <Resource Include="Sample Recipes\English Brown.xml">
       <SubType>Designer</SubType>

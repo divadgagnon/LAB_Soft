@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<?xml-stylesheet type="text/xsl" href="c:\program files\microsoft visual studio 14.0\team tools\static analysis tools\fxcop\Xml\CodeAnalysisReport.xsl"?>
+<?xml-stylesheet type="text/xsl" href="e:\program files 2\team tools\static analysis tools\fxcop\Xml\CodeAnalysisReport.xsl"?>
 <FxCopReport Version="14.0">
  <Targets>
-  <Target Name="C:\Users\utilisateur\Desktop\David\Visual Studio 2013\Projects\Test_To_Delete\Test_To_Delete\bin\Debug\LAB_V2.exe">
+  <Target Name="D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\bin\Debug\LAB_V2.exe">
    <Modules>
     <Module Name="lab_v2.exe">
      <Namespaces>
@@ -12,8 +12,8 @@
          <Members>
           <Member Name="#.ctor()" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
            <Messages>
-            <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Status="Active" Created="2016-01-20 16:43:38Z" FixCategory="NonBreaking">
-             <Issue Certainty="95" Level="CriticalWarning" Path="C:\Users\utilisateur\Desktop\David\Visual Studio 2013\Projects\Test_To_Delete\Test_To_Delete\ViewModel" File="HardwareSetupViewModel.cs" Line="481">'HardwareSetupViewModel.HardwareSetupViewModel()' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: &#xD;&#xA;&#xD;&#xA;HardwareSetupViewModel..ctor()&#xD;&#xA;HardwareSetupViewModel.set_DigitalPins(List&lt;Int32&gt;):Void&#xD;&#xA;ObservableObject.RaisePropertyChanged(String):Void</Issue>
+            <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Status="Active" Created="2016-03-02 12:47:58Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="CriticalWarning" Path="D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\ViewModel" File="HardwareSetupViewModel.cs" Line="36">'HardwareSetupViewModel.HardwareSetupViewModel()' contient une chaîne d'appel aboutissant à un appel vers une méthode virtuelle définie par la classe. Vérifiez le parcours de pile suivant et analysez-y toutes les conséquences imprévisibles : &#xD;&#xA;&#xD;&#xA;HardwareSetupViewModel..ctor()&#xD;&#xA;HardwareSetupViewModel.set_DigitalPins(List&lt;Int32&gt;):Void&#xD;&#xA;ObservableObject.RaisePropertyChanged(String):Void</Issue>
             </Message>
            </Messages>
           </Member>
@@ -23,8 +23,8 @@
          <Members>
           <Member Name="#.ctor()" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
            <Messages>
-            <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Status="Active" Created="2016-01-20 16:43:38Z" FixCategory="NonBreaking">
-             <Issue Certainty="95" Level="CriticalWarning" Path="C:\Users\utilisateur\Desktop\David\Visual Studio 2013\Projects\Test_To_Delete\Test_To_Delete\ViewModel" File="MainViewModel.cs" Line="88">'MainViewModel.MainViewModel()' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: &#xD;&#xA;&#xD;&#xA;MainViewModel..ctor()&#xD;&#xA;ObservableObject.RaisePropertyChanged(String):Void</Issue>
+            <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Status="Active" Created="2016-03-02 12:47:58Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="CriticalWarning" Path="D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\ViewModel" File="MainViewModel.cs" Line="96">'MainViewModel.MainViewModel()' contient une chaîne d'appel aboutissant à un appel vers une méthode virtuelle définie par la classe. Vérifiez le parcours de pile suivant et analysez-y toutes les conséquences imprévisibles : &#xD;&#xA;&#xD;&#xA;MainViewModel..ctor()&#xD;&#xA;ObservableObject.RaisePropertyChanged(String):Void</Issue>
             </Message>
            </Messages>
           </Member>
@@ -39,9 +39,9 @@
  </Targets>
  <Rules>
   <Rule TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214">
-   <Name>Do not call overridable methods in constructors</Name>
-   <Description>Virtual methods defined on the class should not be called from constructors. If a derived class has overridden the method, the derived class version will be called (before the derived class constructor is called).</Description>
-   <Resolution Name="Default">{0} contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: {1}</Resolution>
+   <Name>N'appelez pas de méthodes substituables dans les constructeurs</Name>
+   <Description>Vous ne devez pas appeler des méthodes virtuelles définies dans la classe à partir de constructeurs. Si une classe dérivée a remplacé la méthode, la version de la classe dérivée est appelée (avant le constructeur de classe dérivée).</Description>
+   <Resolution Name="Default">{0} contient une chaîne d'appel aboutissant à un appel vers une méthode virtuelle définie par la classe. Vérifiez le parcours de pile suivant et analysez-y toutes les conséquences imprévisibles : {1}</Resolution>
    <Owner />
    <Url>http://msdn.microsoft.com/library/ms182331.aspx</Url>
    <Email>[none]</Email>
@@ -50,27 +50,27 @@
   </Rule>
  </Rules>
  <Localized>
-  <String Key="Category">Category</String>
-  <String Key="Certainty">Certainty</String>
-  <String Key="CollapseAll">Collapse All</String>
-  <String Key="CheckId">Check Id</String>
-  <String Key="Error">Error</String>
-  <String Key="Errors">error(s)</String>
-  <String Key="ExpandAll">Expand All</String>
-  <String Key="Help">Help</String>
-  <String Key="Line">Line</String>
+  <String Key="Category">Catégorie</String>
+  <String Key="Certainty">Certitude</String>
+  <String Key="CollapseAll">Réduire tout</String>
+  <String Key="CheckId">ID de contrôle</String>
+  <String Key="Error">Erreur</String>
+  <String Key="Errors">erreur(s)</String>
+  <String Key="ExpandAll">Développer tout</String>
+  <String Key="Help">Aide</String>
+  <String Key="Line">Ligne</String>
   <String Key="Messages">message(s)</String>
-  <String Key="LocationNotStoredInPdb">[Location not stored in Pdb]</String>
-  <String Key="Project">Project</String>
-  <String Key="Resolution">Resolution</String>
-  <String Key="Rule">Rule</String>
-  <String Key="RuleFile">Rule File</String>
-  <String Key="RuleDescription">Rule Description</String>
+  <String Key="LocationNotStoredInPdb">[Emplacement non stocké dans le fichier Pdb]</String>
+  <String Key="Project">Projet</String>
+  <String Key="Resolution">Résolution</String>
+  <String Key="Rule">Règle</String>
+  <String Key="RuleFile">Fichier de règles</String>
+  <String Key="RuleDescription">Description de la règle</String>
   <String Key="Source">Source</String>
-  <String Key="Status">Status</String>
-  <String Key="Target">Target</String>
-  <String Key="Warning">Warning</String>
-  <String Key="Warnings">warning(s)</String>
-  <String Key="ReportTitle">Code Analysis Report</String>
+  <String Key="Status">État</String>
+  <String Key="Target">Cible</String>
+  <String Key="Warning">Avertissement</String>
+  <String Key="Warnings">avertissement(s)</String>
+  <String Key="ReportTitle">Rapport d'analyse du code</String>
  </Localized>
 </FxCopReport>

@@ -16,29 +16,40 @@ namespace LAB.Model
 {
     public class BreweryCommands
     {
+        // Internal Model References
         private ArduinoCommands arduino;
         private HardwareSettings hardwareSettings;
         private Brewery brewery;
         private LSPProtocol device;
         private Process.settings ProcessSettings;
 
+        // Timer References
+        DispatcherTimer DisconnectTimer;
+
         // Multiple packet send avoidance variables
         bool BurnerCommandSent;
         bool PumpCommandSent;
         bool Pump2CommandSent;
+        bool AirPump1CommandSent;
+        bool AirPump2CommandSent;
 
         public BreweryCommands()
         {
+            // Initializing Model References
             arduino = new ArduinoCommands(device = new LSPProtocol(new SimplePacketProtocolPacketEncoder()));
             hardwareSettings = new HardwareSettings();
             brewery = new Brewery();
             ProcessSettings = new Process.settings();
 
+            // Registering to Messenger Notifications
             Messenger.Default.Register<AnalogReturn>(this, "VolumeUpdate", VolumeUpdate_MessageReceived);
             Messenger.Default.Register<DigitalReturn>(this, DigitalReturn_MessageReceived);
             Messenger.Default.Register<HardwareSettings>(this, "HardwareSettingsUpdate", UpdateHardwareSettings);
             Messenger.Default.Register<Probes>(this, "TemperatureUpdate", TemperatureUpdate_MessageReceived);
             Messenger.Default.Register <bool>(this, "DesignMode", DesignMode_MessageReceived);
+
+            // Initializing Timers
+            DisconnectTimer = new DispatcherTimer();
         }
 
         private void UpdateHardwareSettings(HardwareSettings _hardwareSettings)
@@ -63,11 +74,20 @@ namespace LAB.Model
         }
 
         // Disconnect and close port command
-        public void Disconnect()
+        public void FinalDisconnect()
         {
             brewery.IsConnected = false;
             arduino.ClosePort();
             Messenger.Default.Send<Brewery>(brewery, "ConnectionUpdate");
+        }
+
+        // Turn all relays off before disconnect
+        public void PreDisconnect()
+        {
+            SetPinModes();
+            DisconnectTimer.Interval = TimeSpan.FromMilliseconds(500);
+            DisconnectTimer.Tick += DisconnectTimer_Tick;
+            DisconnectTimer.Start();
         }
 
         // Set all the pin modes
@@ -102,7 +122,7 @@ namespace LAB.Model
         }
 
         // Turn a burner On or Off
-        public void LightBurner(Vessels vessel, bool State)
+        public void LightBurner(Vessels vessel, RelayState State)
         {
             if(BurnerCommandSent) { return; }
 
@@ -117,7 +137,7 @@ namespace LAB.Model
         }
 
         // Turn pump On or Off
-        public void ActivatePump1(bool State)
+        public void ActivatePump1(RelayState State)
         {
             if(PumpCommandSent) { return; }
             PumpCommandSent = true;
@@ -126,12 +146,29 @@ namespace LAB.Model
         }
 
         // Turn pump 2 On or Off
-        public void ActivatePump2(bool State)
+        public void ActivatePump2(RelayState State)
         {
             if(Pump2CommandSent) { return; }
             Pump2CommandSent = true;
 
             arduino.DigitalWrite(hardwareSettings.Pump2_Pin,State);
+        }
+
+        // Turn air pump 1 On or Off
+        public void ActivateAirPump1(RelayState State)
+        {
+            if(AirPump1CommandSent) { return; }
+            AirPump1CommandSent = true;
+
+            arduino.DigitalWrite(hardwareSettings.AirPump1_Pin, State);
+        }
+
+        public void ActivateAirPump2(RelayState State)
+        {
+            if(AirPump2CommandSent) { return; }
+            AirPump2CommandSent = true;
+
+            arduino.DigitalWrite(hardwareSettings.AirPump2_Pin, State);
         }
 
         // Hold Temperature Set Point
@@ -149,7 +186,7 @@ namespace LAB.Model
             if (Target == 0)
             {
                 // Turn burner off
-                LightBurner(Vessel.Name, false);
+                LightBurner(Vessel.Name, RelayState.Off);
                 Vessel.Temp.SetPoint = Target;
                 Vessel.Temp.SetPointReached = true;
                 goto MessageUpdates;
@@ -162,12 +199,12 @@ namespace LAB.Model
             // Check if temp is within range and process burner action
             if (Vessel.Temp.Value <= Target - ProcessSettings.TempHoldingRange && !Vessel.Burner.IsOn)
             {
-                LightBurner(Vessel.Name, true);
+                LightBurner(Vessel.Name, RelayState.On);
                 Vessel.Temp.SetPointReached = false;
             }
             else if (Vessel.Temp.Value >= Target + ProcessSettings.TempHoldingRange && Vessel.Burner.IsOn)
             {
-                LightBurner(Vessel.Name, false);
+                LightBurner(Vessel.Name, RelayState.Off);
                 Vessel.Temp.SetPointReached = false;
             }
             else if(Vessel.Temp.Value >= Target - ProcessSettings.TempHoldingRange && Vessel.Temp.Value <= Target + ProcessSettings.TempHoldingRange)
@@ -201,6 +238,18 @@ namespace LAB.Model
             }
             
         }
+
+        #region Timer Tick Events
+
+        // Disconnect Timer Definition
+        private void DisconnectTimer_Tick(object sender, EventArgs e)
+        {
+            FinalDisconnect();
+        }
+
+        #endregion
+
+        #region Message Received Handling
 
         // Temperature update received
         private void TemperatureUpdate_MessageReceived(Probes probes)
@@ -261,7 +310,7 @@ namespace LAB.Model
             
             if(_returnPinState.Pin == hardwareSettings.HLT_Burner_Pin)
             {
-                brewery.HLT.Burner.IsOn = _returnPinState.Value;
+                brewery.HLT.Burner.IsOn = !_returnPinState.Value;
                 Messenger.Default.Send<Brewery>(brewery, "HLTBurnerUpdate");
                 BurnerCommandSent = false;
                 return;
@@ -269,7 +318,7 @@ namespace LAB.Model
 
             if(_returnPinState.Pin == hardwareSettings.MLT_Burner_Pin)
             {
-                brewery.MLT.Burner.IsOn = _returnPinState.Value;
+                brewery.MLT.Burner.IsOn = !_returnPinState.Value;
                 Messenger.Default.Send<Brewery>(brewery, "MLTBurnerUpdate");
                 BurnerCommandSent = false;
                 return;
@@ -277,7 +326,7 @@ namespace LAB.Model
 
             if(_returnPinState.Pin == hardwareSettings.BK_Burner_Pin)
             {
-                brewery.BK.Burner.IsOn = _returnPinState.Value;
+                brewery.BK.Burner.IsOn = !_returnPinState.Value;
                 Messenger.Default.Send<Brewery>(brewery, "BKBurnerUpdate");
                 BurnerCommandSent = false;
                 return;
@@ -285,7 +334,7 @@ namespace LAB.Model
 
             if(_returnPinState.Pin == hardwareSettings.Pump1_Pin)
             {
-                brewery.Pump1.IsOn = _returnPinState.Value;
+                brewery.Pump1.IsOn = !_returnPinState.Value;
                 Messenger.Default.Send<Brewery>(brewery, "Pump1Update");
                 PumpCommandSent = false;
                 return;
@@ -293,9 +342,23 @@ namespace LAB.Model
 
             if(_returnPinState.Pin == hardwareSettings.Pump2_Pin)
             {
-                brewery.Pump2.IsOn = _returnPinState.Value;
+                brewery.Pump2.IsOn = !_returnPinState.Value;
                 Messenger.Default.Send<Brewery>(brewery, "Pump2Update");
                 Pump2CommandSent = false;
+            }
+
+            if(_returnPinState.Pin == hardwareSettings.AirPump1_Pin)
+            {
+                brewery.AirPump1.IsOn = !_returnPinState.Value;
+                Messenger.Default.Send<Brewery>(brewery, "AirPump1Update");
+                AirPump1CommandSent = false;
+            }
+
+            if(_returnPinState.Pin == hardwareSettings.AirPump2_Pin)
+            {
+                brewery.AirPump2.IsOn = !_returnPinState.Value;
+                Messenger.Default.Send<Brewery>(brewery, "AirPump2Update");
+                AirPump2CommandSent = false;
             }
             
         }
@@ -323,6 +386,8 @@ namespace LAB.Model
         }
 
     }
+
+    #endregion
 
 
 }

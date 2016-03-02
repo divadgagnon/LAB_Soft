@@ -3,6 +3,7 @@ using LAB.Model;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Threading;
 using System.Windows.Media;
@@ -21,7 +22,10 @@ namespace LAB.ViewModel
         public RelayCommand MainClosingCommand { get; private set; }
         public RelayCommand StartBrewSessionClickCommand { get; private set; }
         public RelayCommand LoadRecipeClickCommand { get; private set; }
-        public RelayCommand DebugDesignSessionClickCommand { get; set; }
+        public RelayCommand DebugDesignSessionClickCommand { get; private set; }
+        public RelayCommand AutomaticModeClickCommand { get; private set; }
+        public RelayCommand SemiAutoModeClickCommand { get; private set; }
+        public RelayCommand ManualModeClickCommand { get; private set; }
 
         // Define Model instance names
         public BreweryCommands breweryCommand;
@@ -63,11 +67,15 @@ namespace LAB.ViewModel
         TimeSpan BoilStartTime;
         TimeSpan BoilEndTime;
 
+        // Bindable List
+        List<bool> automationModeChecked;
+
         // Define Property Names for RaiseProperTyChanged Events
         public const string ConnectionStatusPropertyName = "ConnectionStatus";
         public const string StartSessionButtonContentPropertyName = "StartSessionButtonContent";
         public const string HLT_Temp_DisplayPropertyName = "HLT_Temp_Display";
         public const string BreweryStateDisplayPropertyName = "BreweryStateDisplay";
+        public const string AutomationModeCheckedPropertyName = "AutomationModeChecked";
 
         // Define Bindable Properties
         public string ConnectionStatus
@@ -125,6 +133,21 @@ namespace LAB.ViewModel
                         {
                             return BreweryStatusString + "Chill";
                         }
+                    case BreweryState.Fermenter_Transfer:
+                        {
+                            return BreweryStatusString + "Fermenter Transfer";
+                        }
+                    case BreweryState.Manual_Override:
+                        {
+                            if (brewery.AutomationMode == automationMode.Manual)
+                            {
+                                return BreweryStatusString + "Manual Override";
+                            }
+                            else
+                            {
+                                return BreweryStatusString + "Semi-Automatic Control";
+                            }
+                        }
                 }
 
                 return BreweryStatusString + "StandBy";
@@ -146,12 +169,12 @@ namespace LAB.ViewModel
             }
         }
 
-        // HLT Temp Display (Debug testing only)
-        public double HLT_Temp_Display
+        // Automation Mode Menu item Checked
+        public List<bool> AutomationModeChecked
         {
             get
             {
-                return brewery.HLT.Temp.Value;
+                return automationModeChecked;
             }
         }
 
@@ -168,7 +191,10 @@ namespace LAB.ViewModel
             brewery = new Brewery();
             process = new Process();
             probes = new Probes();
-            userAlarm = new UserAlarm(); 
+            userAlarm = new UserAlarm();
+
+            // Initializing UI variables
+            automationModeChecked = new List<bool>(new bool[] { true, false, false });
 
             // Initializing RelayCommand Instances
             ConnectionSetupClickCommand = new RelayCommand(connectionSetupClickCommand);
@@ -177,6 +203,9 @@ namespace LAB.ViewModel
             MainClosingCommand = new RelayCommand(mainClosing);
             LoadRecipeClickCommand = new RelayCommand(loadRecipeClickCommand);
             DebugDesignSessionClickCommand = new RelayCommand(debugDesignClickCommand);
+            AutomaticModeClickCommand = new RelayCommand(automaticModeClickCommand);
+            SemiAutoModeClickCommand = new RelayCommand(semiAutomaticModeClickCommand);
+            ManualModeClickCommand = new RelayCommand(manualModeClickCommand);
 
             // Initializing Timers
             UpdateTempSensorTimer = new DispatcherTimer();
@@ -215,6 +244,8 @@ namespace LAB.ViewModel
             Messenger.Default.Register<Brewery>(this, "BKBurnerUpdate", BKBurnerUpdate_MessageReceived);
             Messenger.Default.Register<Brewery>(this, "Pump1Update", Pump1Update_MessageReceived);
             Messenger.Default.Register<Brewery>(this, "Pump2Update", Pump2Update_MessageReceived);
+            Messenger.Default.Register<Brewery>(this, "AirPump1Update", AirPump1Update_MessageReceived);
+            Messenger.Default.Register<Brewery>(this, "AirPump2Update", AirPump2Update_MessageReceived);
             Messenger.Default.Register<string>(this, "SelectedcomPort", SelectedcomPort_MessageReceived);
             Messenger.Default.Register<Process>(this, Process_MessageReceived);
             Messenger.Default.Register<Probes>(this, "GetConnectedProbes", GetConnectedProbes_MessageReceived);
@@ -272,6 +303,9 @@ namespace LAB.ViewModel
 
                         Messenger.Default.Send<Brewery>(brewery, "HLTVolumeSetPointUpdate");
                         Messenger.Default.Send<Brewery>(brewery, "HLTTempSetPointUpdate");
+
+                        // Turn on air pump 1 for Level monitoring
+                        if(!brewery.AirPump1.IsOn) { breweryCommand.ActivateAirPump1(RelayState.On); }
 
                         // Check if HLT volume reached SetPoint
                         if(brewery.HLT.Volume.Value >= brewery.HLT.Volume.SetPoint)
@@ -346,7 +380,7 @@ namespace LAB.ViewModel
                             else if (brewery.Pump1.IsPrimed && !brewery.Pump1.IsOn)
                             {
                                 HLTStartVolume = brewery.HLT.Volume.Value;
-                                breweryCommand.ActivatePump1(true);
+                                breweryCommand.ActivatePump1(RelayState.On);
                                 PlayAlarm("Transfering", false, false, false);
                             }
                             // Update the transfered volume
@@ -361,7 +395,7 @@ namespace LAB.ViewModel
                             // Stop the transfer
                             if (brewery.Pump1.IsOn)
                             {
-                                breweryCommand.ActivatePump1(false);
+                                breweryCommand.ActivatePump1(RelayState.Off);
                             }
 
                             // Set the Volume Set point reached property
@@ -412,7 +446,7 @@ namespace LAB.ViewModel
                             if(userAlarm.ProceedIsPressed)
                             {
                                 // Start the mash process
-                                breweryCommand.LightBurner(Vessels.MLT, false);
+                                breweryCommand.LightBurner(Vessels.MLT, RelayState.Off);
                                 breweryState = BreweryState.Mash;
                                 RaisePropertyChanged(BreweryStateDisplayPropertyName);
                                 userAlarm = new UserAlarm();
@@ -475,7 +509,8 @@ namespace LAB.ViewModel
                         }
                         else if(brewery.Pump2.IsPrimed && !brewery.Pump2.IsOn)
                         {
-                            breweryCommand.ActivatePump2(true);
+                            breweryCommand.ActivatePump2(RelayState.On);
+                            breweryCommand.ActivateAirPump2(RelayState.On);
                         }
 
                         break;
@@ -487,7 +522,7 @@ namespace LAB.ViewModel
                         if(!userAlarm.MessageSent && !SpargeModeOn)
                         {
                             PlayAlarm("ValveSpargeMode", false, false, true);
-                            breweryCommand.ActivatePump2(false);
+                            breweryCommand.ActivatePump2(RelayState.Off);
                             SpargeModeOn = true;
                             userAlarm = new UserAlarm();
                         }
@@ -500,8 +535,8 @@ namespace LAB.ViewModel
                         {
                             // Save the HLT Start Volume and start the pumps
                             HLTStartVolume = brewery.HLT.Volume.Value;
-                            breweryCommand.ActivatePump1(true);
-                            breweryCommand.ActivatePump2(true);
+                            breweryCommand.ActivatePump1(RelayState.On);
+                            breweryCommand.ActivatePump2(RelayState.On);
                             FirstSparge = false;
 
                             // Turn off MLT Temp monitoring
@@ -531,12 +566,13 @@ namespace LAB.ViewModel
                         {
                             if (brewery.Pump1.IsOn)
                             {
-                                breweryCommand.ActivatePump1(false);
+                                breweryCommand.ActivatePump1(RelayState.Off);
+                                breweryCommand.ActivateAirPump1(RelayState.Off);
                             }
 
                             if(brewery.HLT.Volume.Value <= 10 && brewery.HLT.Burner.IsOn)
                             {
-                                breweryCommand.LightBurner(Vessels.HLT, false);
+                                breweryCommand.LightBurner(Vessels.HLT, RelayState.Off);
                                 brewery.HLT.Temp.SetPointReached = false;
                                 Messenger.Default.Send<Brewery>(brewery, "HLTTempSetPointReachedUpdate");
                             }
@@ -553,12 +589,12 @@ namespace LAB.ViewModel
 
                             if (brewery.Pump1.IsOn)
                             {
-                                breweryCommand.ActivatePump1(false);
+                                breweryCommand.ActivatePump1(RelayState.Off);
                             }
 
                             if (brewery.HLT.Volume.Value <= 10 && brewery.HLT.Burner.IsOn)
                             {
-                                breweryCommand.LightBurner(Vessels.HLT, false);
+                                breweryCommand.LightBurner(Vessels.HLT, RelayState.Off);
                                 brewery.HLT.Temp.SetPointReached = false;
                                 Messenger.Default.Send<Brewery>(brewery, "HLTTempSetPointReachedUpdate");
                             }
@@ -578,7 +614,7 @@ namespace LAB.ViewModel
                         {
                             if (brewery.Pump2.IsOn)
                             {
-                                breweryCommand.ActivatePump2(false);
+                                breweryCommand.ActivatePump2(RelayState.Off);
                             }
 
                             brewery.BK.Volume.SetPointReached = true;
@@ -661,14 +697,31 @@ namespace LAB.ViewModel
                         // Monitor BK Level
                         if(brewery.BK.Volume.Value == 0)
                         {
+                            breweryCommand.ActivateAirPump2(RelayState.Off);
                             PlayAlarm("Ferment", false, false, false);
                             UpdateTempSensorTimer.Stop();
                             UpdateVolSensorTimer.Stop();
-                            breweryCommand.Disconnect();
+                            breweryCommand.PreDisconnect();
                         }
 
                         break;
                     }
+            }
+        }
+
+        #endregion
+
+        #region Manual Control Methods
+
+        private void HLTBurnerControl()
+        {
+            if(brewery.HLT.Burner.IsOn)
+            {
+                breweryCommand.LightBurner(Vessels.HLT, RelayState.Off);
+            }
+            else
+            {
+                breweryCommand.LightBurner(Vessels.HLT, RelayState.On);
             }
         }
 
@@ -869,6 +922,13 @@ namespace LAB.ViewModel
 
         SkipDAQTimers:
 
+            // Verify the automation mode selected
+            if((brewery.AutomationMode == automationMode.Manual) || (brewery.AutomationMode == automationMode.SemiAuto))
+            {
+                breweryState = BreweryState.Manual_Override;
+                return;
+            }
+
             // Run state Machine
             breweryState = BreweryState.StandBy;
             RunAutoStateMachine();
@@ -908,10 +968,34 @@ namespace LAB.ViewModel
             }
         }
 
+        private void automaticModeClickCommand()
+        {
+            automationModeChecked.Clear();
+            automationModeChecked = new List<bool>(new bool[] { true, false, false });
+            brewery.AutomationMode = automationMode.Automatic;
+            RaisePropertyChanged(AutomationModeCheckedPropertyName);
+        }
+
+        private void semiAutomaticModeClickCommand()
+        {
+            automationModeChecked.Clear();
+            automationModeChecked = new List<bool>(new bool[] { false, true, false });
+            brewery.AutomationMode = automationMode.SemiAuto;
+            RaisePropertyChanged(AutomationModeCheckedPropertyName);
+        }
+
+        private void manualModeClickCommand()
+        {
+            automationModeChecked.Clear();
+            automationModeChecked = new List<bool>(new bool[] { false, false, true });
+            brewery.AutomationMode = automationMode.Manual;
+            RaisePropertyChanged(AutomationModeCheckedPropertyName);
+        }
+
         // Gets executed before the application shuts down to close the comPort
         private void mainClosing()
         {
-            breweryCommand.Disconnect();
+            if (brewery.IsConnected) { breweryCommand.PreDisconnect(); }
         }
 
         #endregion
@@ -974,14 +1058,18 @@ namespace LAB.ViewModel
                 Messenger.Default.Send<bool>(brewery.IsConnected, "ConnectButtonContent");
                 RaisePropertyChanged(ConnectionStatusPropertyName);
                 if (process.Session.StartRequested) { startBrewSessionClickCommand(); }
-                if(brewery.IsConnected) { Messenger.Default.Send<NotificationMessageAction>(new NotificationMessageAction("CloseConnectionSetup",ConnectionSetupCloseCallback), "WindowOperation"); }
+                if(brewery.IsConnected)
+                {
+                    Messenger.Default.Send<NotificationMessageAction>(new NotificationMessageAction("CloseConnectionSetup",ConnectionSetupCloseCallback), "WindowOperation");
+                    breweryCommand.SetPinModes();
+                }
             }
         }
 
         // Connection Setup Automatic Close Callback
         private void ConnectionSetupCloseCallback()
         {
-            // no code to execute
+            // No code to execute
         }
 
         // Selected comPort
@@ -990,7 +1078,7 @@ namespace LAB.ViewModel
             if (hardwareSettings.comPort != null)
             {
                 if (!brewery.IsConnected) { breweryCommand.Connect(hardwareSettings.comPort); return; }
-                breweryCommand.Disconnect(); return;
+                breweryCommand.PreDisconnect(); return;
             }
 
             MessageBox.Show("No Com Port was selected");
@@ -1025,6 +1113,18 @@ namespace LAB.ViewModel
         private void Pump2Update_MessageReceived(Brewery _brewery)
         {
             brewery.Pump2.IsOn = _brewery.Pump2.IsOn;
+        }
+
+        // Air Pump 1 Update
+        private void AirPump1Update_MessageReceived(Brewery _brewery)
+        {
+            brewery.AirPump1.IsOn = _brewery.AirPump1.IsOn;
+        }
+
+        // Air Pump 2 Update
+        private void AirPump2Update_MessageReceived(Brewery _brewery)
+        {
+            brewery.AirPump2.IsOn = _brewery.AirPump2.IsOn;
         }
 
         // User Alarm Return

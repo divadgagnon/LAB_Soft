@@ -165,12 +165,12 @@
                 <ListBoxItem>
                     <StackPanel Orientation="Horizontal">
                         <ListBoxItem Content="Type : " Style="{StaticResource SubItemName}"/>
-                        <ListBoxItem Content="{Binding Path=Type}" Style="{StaticResource SubItem}"/>
+                        <ListBoxItem Content="{Binding Path=Yeast.Type}" Style="{StaticResource SubItem}"/>
                     </StackPanel>
                 </ListBoxItem>
                     <ListBoxItem>
                     <StackPanel Orientation="Horizontal">
-                        <ListBoxItem Content="Form : " FontWeight="Bold" Style="{StaticResource SubItemName}"/>
+                        <ListBoxItem Content="Form : " Style="{StaticResource SubItemName}"/>
                         <ListBoxItem Content="{Binding Path=Yeast.Form}" Style="{StaticResource SubItem}"/>
                     </StackPanel>
                 </ListBoxItem>
@@ -183,8 +183,28 @@
                         <ListBoxItem Content="°C" Style="{StaticResource SubItem}"/>
                     </StackPanel>
                 </ListBoxItem>
-                <!-- Adjuncts List -->
+            
+            <!-- Adjuncts List -->
             <ListBoxItem Content="Adjuncts" Style="{StaticResource SubItemTitle}"/>
+                <ListView Width="275" ItemsSource="{Binding Adjuncts}" Style="{StaticResource SubItem}">
+                    <ListView.View>
+                        <GridView>
+                            <GridView.Columns>
+                                <GridViewColumn Width="auto" DisplayMemberBinding="{Binding Path=Name}"/>
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Quantity, StringFormat=F}" Foreground="{DynamicResource MenuBackground}"/>
+                                                <TextBlock Text=" Kg" Foreground="{DynamicResource MenuBackground}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView.Columns>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </ListBox>
 
         <!-- Recipe Info Menu -->
@@ -218,14 +238,43 @@
             <ListBoxItem Content="General" Style="{StaticResource SubItemTitle}"/>
                 <ListBoxItem>
                     <StackPanel Orientation="Horizontal">
-                        <ListBoxItem Content="Name : "/>
-                        <ListBoxItem Content="{Binding Path=Name}"/>
+                        <ListBoxItem Content="Name : " Style="{StaticResource SubItemName}"/>
+                        <ListBoxItem Content="{Binding Path=Recipe.Name}" Style="{StaticResource SubItem}"/>
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem>
+                    <StackPanel Orientation="Horizontal">
+                        <ListBoxItem Content="Batchsize : " Style="{StaticResource SubItemName}"/>
+                        <ListBoxItem Content="{Binding Path=Recipe.BatchSize, StringFormat=F}" Style="{StaticResource SubItem}"/>
+                        <ListBoxItem Content="l" Style="{StaticResource SubItem}"/>
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem>
+                    <StackPanel Orientation="Horizontal">
+                        <ListBoxItem Content="Color : " Style="{StaticResource SubItemName}"/>
+                        <ListBoxItem Content="{Binding Path=Recipe.SRMColor}" ContentStringFormat="F" Style="{StaticResource SubItem}"/>
+                        <ListBoxItem Content="SRM" Style="{StaticResource SubItem}"/>
                     </StackPanel>
                 </ListBoxItem>
 
-                <!-- Recipe Style Info -->
-            <ListBoxItem Content="Style" Style="{StaticResource SubItemTitle}"/>
-        </ListBox>
+        <!-- Recipe Style Info -->
+        <ListBoxItem Content="Style" Style="{StaticResource SubItemTitle}"/>
+                <StackPanel Orientation="Horizontal">
+                    <ListBoxItem Content="{Binding Path=Style.Name}"/>
+                </StackPanel>
+                <ListBoxItem>
+                    <StackPanel Orientation="Horizontal">
+                        <ListBoxItem Content="Type : " Style="{StaticResource SubItemName}"/>
+                        <ListBoxItem Content="{Binding Path=Recipe.Type}" Style="{StaticResource SubItem}"/>
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem>
+                    <StackPanel Orientation="Horizontal">
+                        <ListBoxItem Content="Category : " Style="{StaticResource SubItemName}"/>
+                        <ListBoxItem Content="{Binding Path=Recipe.Category}" Style="{StaticResource SubItem}"/>
+                    </StackPanel>
+                </ListBoxItem>
+            </ListBox>
 
         <!-- Process Menu -->
         <ListBoxItem Style="{StaticResource MainItem}" BorderThickness="0">

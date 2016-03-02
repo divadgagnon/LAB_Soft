@@ -15,6 +15,7 @@ namespace LAB.Model
         Process process;
         Ingredients ingredients;
         General Recipe;
+        Style style;
 
         #region Constructor
 
@@ -24,6 +25,7 @@ namespace LAB.Model
             process = new Process();
             ingredients = new Ingredients();
             Recipe = new General();
+            style = new Style();
         }
 
         #endregion
@@ -70,6 +72,11 @@ namespace LAB.Model
             Recipe.Category = xml.Descendants("STYLE").Elements("CATEGORY").Single().Value;
             Recipe.BatchSize = (double)xml.Descendants("RECIPE").Elements("BATCH_SIZE").Single();
 
+            // ----------------------------------------------- Style -------------------------------------------------------
+
+            style.Name = xml.Descendants("STYLE").Elements("NAME").Single().Value;
+            style.Description = xml.Descendants("STYLE").Elements("NOTES").Single().Value;
+
             // -------------------------------------------- Ingredients  ---------------------------------------------------
 
             // Get Ingredients : Malts
@@ -78,7 +85,11 @@ namespace LAB.Model
             {
                 if (node.Element("TYPE").Value == "Grain")
                 {
-                    ingredients.Malts.Add(new Ingredients.Malt() { Name = node.Element("NAME").Value, Quantity = (double)node.Element("AMOUNT"), SRM = node.Element("DISPLAY_COLOR").Value });
+                    ingredients.Malts.Add(new Ingredients.Malt() { Name = node.Element("NAME").Value, Quantity = (double)node.Element("AMOUNT"), SRM = (double)node.Element("COLOR") });
+                }
+                else
+                {
+                    ingredients.Adjuncts.Add(new Ingredients.Malt() { Name = node.Element("NAME").Value, Quantity = (double)node.Element("AMOUNT")});
                 }
             }
 
@@ -140,7 +151,18 @@ namespace LAB.Model
             // Get Process Step : Boil
             process.Boil.Time = (double)xml.Descendants("RECIPE").Elements("BOIL_TIME").Single();
 
+            // ------------------------------------- Color Calculation -------------------------------------
+
+            double SRMContribution=0;
+            foreach (var grain in ingredients.Malts)
+            {
+                SRMContribution = SRMContribution + grain.Quantity* 2.20462 * grain.SRM;
+            }
+
+            Recipe.SRMColor = SRMContribution / (Recipe.BatchSize* 0.264172);
+            
             // ----------------------------------------- Water Info ----------------------------------------
+            
             // Total Water Volume Needed Calculation
             double PreBoilVol = (double)xml.Descendants("RECIPE").Elements("BOIL_SIZE").Single();
             double TotalWaterNeeded = PreBoilVol + GrainAmount + MLTDeadspace;

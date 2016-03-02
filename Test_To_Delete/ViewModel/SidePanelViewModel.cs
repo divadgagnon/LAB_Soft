@@ -22,6 +22,7 @@ namespace LAB.ViewModel
         Process process;
         Ingredients ingredients;
         General recipe;
+        Model.Style style;
 
         // Command Definitions
         public RelayCommand RecipeExpandCommand { get; private set;}
@@ -40,6 +41,7 @@ namespace LAB.ViewModel
         public const string MaltsPropertyName = "Malts";
         public const string HopsPropertyName = "Hops";
         public const string YeastPropertyName = "Yeast";
+        public const string AdjunctsPropertyName = "Adjuncts";
         public const string RecipePropertyName = "Recipe";
 
         // Local properties
@@ -117,6 +119,11 @@ namespace LAB.ViewModel
         public Ingredients.yeast Yeast
         {
             get { return ingredients.Yeast; }
+        }
+
+        public List<Ingredients.Malt> Adjuncts
+        {
+            get { return ingredients.Adjuncts; }
         }
 
         // Recipe Properties
@@ -227,6 +234,7 @@ namespace LAB.ViewModel
             // Raise concerned properties
             RaisePropertyChanged(MaltsPropertyName);
             RaisePropertyChanged(HopsPropertyName);
+            RaisePropertyChanged(AdjunctsPropertyName);
             RaisePropertyChanged(YeastPropertyName);
         }
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Xml.Serialization;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -28,6 +30,10 @@ namespace LAB.ViewModel
         public RelayCommand SaveSettingClickCommand { get; private set; }
         public RelayCommand ConfirmPinSelectedCommand { get; private set; }
         public RelayCommand CancelClickCommand { get; private set; }
+        public RelayCommand SaveAsDefault { get; private set; }
+
+        // Path to XML Default data
+        private string DefaultSettingsPath = @"..\..\Data\DefaultHardwareSettings.xml";
 
         // Define Property Names for RaiseProperTyChanged Events
         public const string SelectedSettingPropertyName = "SelectedSetting";
@@ -488,6 +494,7 @@ namespace LAB.ViewModel
             SaveSettingClickCommand = new RelayCommand(saveSettingClickCommand);
             ConfirmPinSelectedCommand = new RelayCommand(confirmSettingCommand);
             CancelClickCommand = new RelayCommand(cancelClickCommand);
+            SaveAsDefault = new RelayCommand(saveAsDefault);
 
             // Initialize Digital Pin list
             DigitalPins = new List<int>();
@@ -510,6 +517,7 @@ namespace LAB.ViewModel
             Messenger.Default.Register<Probes>(this, "GetConnectedProbes", Probes_MessageReceived);
 
             // Set Default Values for settings
+            GetSaveedSettings();
             SetDefaultSettings();
         }
 
@@ -685,7 +693,8 @@ namespace LAB.ViewModel
         }
 
         private void CloseHardwareSettings_CallBack()
-        { }
+        {
+        }
 
         private void editSettingClickCommand()
         {
@@ -720,6 +729,28 @@ namespace LAB.ViewModel
             
             // Else send message to open EditDigitalPinDialogView
             Messenger.Default.Send<NotificationMessage>(new NotificationMessage("OpenDigitalPinDialog"), "WindowOperation");
+        }
+
+        // Save the settings as new default settings
+        private void saveAsDefault()
+        {
+            XmlSerializer serializer = new XmlSerializer(hardwareSettings.GetType());
+            StreamWriter writer = new StreamWriter(DefaultSettingsPath);
+
+            serializer.Serialize(writer, hardwareSettings);
+
+            serializer = null;
+            writer.Close();
+            writer = null;
+        }
+
+        // Get the settings saved as default
+        private void GetSaveedSettings()
+        {
+            XmlSerializer serializer = new XmlSerializer(hardwareSettings.GetType());
+            StreamReader reader = new StreamReader(DefaultSettingsPath);
+
+            hardwareSettings = (HardwareSettings)serializer.Deserialize(reader);
         }
 
         // Apply changes from the edit dialog

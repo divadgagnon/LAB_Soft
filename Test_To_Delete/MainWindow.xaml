@@ -55,6 +55,13 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </MenuItem>
+                <MenuItem Header="Export Session Report" Template="{DynamicResource MenuSubItem_LABSTYLE}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <cmd:EventToCommand Command=""/> <!-- À Implémenter -->
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
             </MenuItem>
 
             <MenuItem Header="_Edit" Template="{DynamicResource MenuItem_LABSTYLE}"/>
@@ -74,15 +81,30 @@
                     </i:Interaction.Triggers>
                 </MenuItem>
             </MenuItem>
-
-            <MenuItem Header="_Settings" Template="{DynamicResource MenuItem_LABSTYLE}">
-                <MenuItem Header="Automation Mode" Template="{DynamicResource MenuSubItem_LABSTYLE}">
+            <MenuItem Header="_Automation Mode" Template="{DynamicResource MenuItem_LABSTYLE}">
+                <MenuItem Header="Automatic" Template="{DynamicResource MenuSubItem_LABSTYLE}" IsCheckable="True" IsChecked="{Binding AutomationModeChecked[0]}">
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Hover">
-                            <cmd:EventToCommand Command=""/>
+                        <i:EventTrigger EventName="Click">
+                            <cmd:EventToCommand Command="{Binding AutomaticModeClickCommand}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </MenuItem>
+                <MenuItem Header="Semi-Automatic" Template="{DynamicResource MenuSubItem_LABSTYLE}" IsCheckable="True" IsChecked="{Binding AutomationModeChecked[1]}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <cmd:EventToCommand Command="{Binding SemiAutoModeClickCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="Manual" Template="{DynamicResource MenuSubItem_LABSTYLE}" IsCheckable="True" IsChecked="{Binding AutomationModeChecked[2]}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <cmd:EventToCommand Command="{Binding ManualModeClickCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Settings" Template="{DynamicResource MenuItem_LABSTYLE}">
                 <MenuItem Header="Connection Setup" Template="{DynamicResource MenuSubItem_LABSTYLE}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
