@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight.Command;
 using LAB.Model;
 using System;
 
@@ -7,8 +8,12 @@ namespace LAB.ViewModel
 {
     public class HLTViewModel : ViewModelBase
     {
-        // Instance intialization
+        // Model Instance intialization
         Brewery brewery;
+
+        // Relay Commands Initialization
+
+        public RelayCommand BurnerClickCommand { get; private set; }
 
         // Property Names
         public const string WaterHeightPropertyName = "WaterHeight";
@@ -138,6 +143,9 @@ namespace LAB.ViewModel
             // Create new instances of model classes
             brewery = new Brewery();
 
+            // Create new instances of relay commands
+            BurnerClickCommand = new RelayCommand(burnerClickCommand);
+
             // Register to sensor update messages
             Messenger.Default.Register<Brewery>(this, "VolumeUpdate", VolumeUpdate_MessageReceived);
             Messenger.Default.Register<Brewery>(this, "TemperatureUpdate", TemperatureUpdate_MessageReceived);
@@ -146,6 +154,11 @@ namespace LAB.ViewModel
             Messenger.Default.Register<Brewery>(this, "HLTVolumeSetPointReachedUpdate", HLTVolumeSetPointReachedUpdate_MessageReceived);
             Messenger.Default.Register<Brewery>(this, "HLTTempSetPointUpdate", HLTTempSetPointUpdate_MessageReceived);
             Messenger.Default.Register<Brewery>(this, "HLTTempSetPointReachedUpdate", HLTTempSetPointReachedUpdate_MessageReceived);
+        }
+
+        private void burnerClickCommand()
+        {
+            Messenger.Default.Send<Brewery.vessel>(brewery.HLT, "BurnerOverride");
         }
 
         private void TemperatureUpdate_MessageReceived(Brewery _brewery)

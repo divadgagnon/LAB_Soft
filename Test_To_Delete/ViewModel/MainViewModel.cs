@@ -26,6 +26,8 @@ namespace LAB.ViewModel
         public RelayCommand AutomaticModeClickCommand { get; private set; }
         public RelayCommand SemiAutoModeClickCommand { get; private set; }
         public RelayCommand ManualModeClickCommand { get; private set; }
+        public RelayCommand Pump1ClickCommand { get; private set; }
+        public RelayCommand Pump2ClickCommand { get; private set; }
 
         // Define Model instance names
         public BreweryCommands breweryCommand;
@@ -256,6 +258,7 @@ namespace LAB.ViewModel
             Messenger.Default.Register<Brewery>(this, "HLTTempSetPointReachedUpdate", HLTTempSetPointReachedUpdate_MessageReceived);
             Messenger.Default.Register<Brewery>(this, "MLTTempSetPointReachedUpdate", MLTTempSetPointReachedUpdate_MessageReceived);
             Messenger.Default.Register<Brewery>(this, "BKTempSetPointReachedUpdate", BKTempSetPointReachedUpdate_MessageReceived);
+            Messenger.Default.Register<Brewery.vessel>(this, "BurnerOverride", BurnerOverride_MessageReceived);
         }
 
         #endregion
@@ -713,15 +716,78 @@ namespace LAB.ViewModel
 
         #region Manual Control Methods
 
-        private void HLTBurnerControl()
+        // Burner Control Command
+        private void BurnerOverride_MessageReceived(Brewery.vessel Vessel)
         {
-            if(brewery.HLT.Burner.IsOn)
+            if(brewery.AutomationMode != automationMode.Manual) { return; }
+            
+            if(Vessel.Burner.IsOn)
             {
-                breweryCommand.LightBurner(Vessels.HLT, RelayState.Off);
+                breweryCommand.LightBurner(Vessel.Name, RelayState.Off);
             }
             else
             {
-                breweryCommand.LightBurner(Vessels.HLT, RelayState.On);
+                breweryCommand.LightBurner(Vessel.Name, RelayState.On);
+            }
+        }
+
+        // Pump Control Commands
+
+        private void Pump1Control()
+        {
+            if (brewery.AutomationMode != automationMode.Manual) { return; }
+
+            if (brewery.Pump1.IsOn)
+            {
+                breweryCommand.ActivatePump1(RelayState.Off);
+            }
+            else
+            {
+                breweryCommand.ActivatePump1(RelayState.On);
+            }
+        }
+
+        private void Pump2Control()
+        {
+            if (brewery.AutomationMode != automationMode.Manual) { return; }
+
+            if (brewery.Pump2.IsOn)
+            {
+                breweryCommand.ActivatePump2(RelayState.Off);
+            }
+            else
+            {
+                breweryCommand.ActivatePump2(RelayState.On);
+            }
+        }
+
+        // Air pump Control Commands
+
+        private void AirPump1Control()
+        {
+            if(brewery.AutomationMode != automationMode.Manual) { return; }
+
+            if(brewery.AirPump1.IsOn)
+            {
+                breweryCommand.ActivateAirPump1(RelayState.Off);
+            }
+            else
+            {
+                breweryCommand.ActivateAirPump1(RelayState.On);
+            }
+        }
+
+        private void AirPump2Control()
+        {
+            if (brewery.AutomationMode != automationMode.Manual) { return; }
+
+            if (brewery.AirPump2.IsOn)
+            {
+                breweryCommand.ActivateAirPump2(RelayState.Off);
+            }
+            else
+            {
+                breweryCommand.ActivateAirPump2(RelayState.On);
             }
         }
 
@@ -786,7 +852,6 @@ namespace LAB.ViewModel
         private void UpdateTempSensorTimer_Tick(object sender, EventArgs e)
         {
             breweryCommand.UpdateTempSensors();
-            //RaisePropertyChanged("TempDisplayPropertyName");
         }
 
         private void UpdateVolSensorTimer_Tick(object sender, EventArgs e)
@@ -1038,6 +1103,7 @@ namespace LAB.ViewModel
             brewery.HLT.Temp.Value = _brewery.HLT.Temp.Value;
             brewery.MLT.Temp.Value = _brewery.MLT.Temp.Value;
             brewery.BK.Temp.Value = _brewery.BK.Temp.Value;
+            if (brewery.AutomationMode != automationMode.Automatic) { return; }
             RunAutoStateMachine();
         }
 
@@ -1046,6 +1112,7 @@ namespace LAB.ViewModel
         {
             if (_brewery.HLT.Volume.Value != 500) { brewery.HLT.Volume.Value = _brewery.HLT.Volume.Value; }
             if (_brewery.BK.Volume.Value != 500) { brewery.BK.Volume.Value = _brewery.BK.Volume.Value; }
+            if (brewery.AutomationMode != automationMode.Automatic) { return; }
             RunAutoStateMachine();
         }
 
