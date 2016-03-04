@@ -75,6 +75,7 @@
       <DependentUpon>DebugTool.xaml</DependentUpon>
     </Compile>
     <Compile Include="Debug Tools\DebugToolViewModel.cs" />
+    <Compile Include="Helpers\MouseButtonEventArgsToPointConverter.cs" />
     <Compile Include="Model\ArduinoCommands.cs" />
     <Compile Include="Model\Data.cs" />
     <Compile Include="Model\BreweryCommands.cs" />
@@ -84,8 +85,12 @@
     <Compile Include="SerialComm\PacketEncoder\Interfaces\IPacketEncoder.cs" />
     <Compile Include="SerialComm\PacketEncoder\SimplePacketProtocolPacketEncoder.cs" />
     <Compile Include="SerialComm\SerialPortData\SerialPortSettings.cs" />
+    <Compile Include="ViewModel\BallValveViewModel.cs" />
     <Compile Include="ViewModel\SidePanelViewModel.cs" />
     <Compile Include="ViewModel\TimerViewModel.cs" />
+    <Compile Include="Views\BallValveView.xaml.cs">
+      <DependentUpon>BallValveView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SidePanelView.xaml.cs">
       <DependentUpon>SidePanelView.xaml</DependentUpon>
     </Compile>
@@ -154,6 +159,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\BallValveView.xaml">
+      <SubType>Form</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\SidePanelView.xaml">
       <SubType>Form</SubType>
       <Generator>MSBuild:Compile</Generator>

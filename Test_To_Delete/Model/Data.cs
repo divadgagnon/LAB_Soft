@@ -316,6 +316,23 @@ namespace LAB.Model
             public bool IsPrimed { get; set; }
             public bool IsPriming { get; set; }
         }
+
+        public class valve
+        {
+            public bool IsOpen { get; set; }
+            public request Request { get; set; }
+            
+            public valve()
+            {
+                Request = new request();
+            }
+            
+            public class request
+            {
+                public bool Open { get; set; }
+                public bool Close { get; set; }
+            }
+        }
     }
 
     public class UserAlarm

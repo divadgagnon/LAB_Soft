@@ -146,7 +146,7 @@
                 <ColumnDefinition Width="10*"/>
                 <ColumnDefinition Width="70*"/>
             </Grid.ColumnDefinitions>
-            <Views:HLTView Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="4.8,0"/>
+            <Views:HLTView Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="4.8,0" Loaded="HLTView_Loaded"/>
             <Views:MLTView Grid.Column="3" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="5,0,4.6,0"/>
             <Views:BKView Grid.Column="5" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="5,0,4.6,0"/>
             <Views:Pump1View Grid.Column="2" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65" >

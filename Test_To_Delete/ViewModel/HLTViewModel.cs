@@ -3,6 +3,7 @@ using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Command;
 using LAB.Model;
 using System;
+using System.Windows;
 
 namespace LAB.ViewModel
 {
@@ -14,6 +15,7 @@ namespace LAB.ViewModel
         // Relay Commands Initialization
 
         public RelayCommand BurnerClickCommand { get; private set; }
+        public RelayCommand<Point> TempSetPointClickCommand { get; private set; }
 
         // Property Names
         public const string WaterHeightPropertyName = "WaterHeight";
@@ -145,6 +147,7 @@ namespace LAB.ViewModel
 
             // Create new instances of relay commands
             BurnerClickCommand = new RelayCommand(burnerClickCommand);
+            TempSetPointClickCommand = new RelayCommand<Point>(tempSetPointClickCommand);
 
             // Register to sensor update messages
             Messenger.Default.Register<Brewery>(this, "VolumeUpdate", VolumeUpdate_MessageReceived);
@@ -156,11 +159,19 @@ namespace LAB.ViewModel
             Messenger.Default.Register<Brewery>(this, "HLTTempSetPointReachedUpdate", HLTTempSetPointReachedUpdate_MessageReceived);
         }
 
+        // UI Methods
+
         private void burnerClickCommand()
         {
             Messenger.Default.Send<Brewery.vessel>(brewery.HLT, "BurnerOverride");
         }
 
+        private void tempSetPointClickCommand(Point MousePos)
+        {
+            // To Do
+        }
+
+        // Message Received Handling Methods
         private void TemperatureUpdate_MessageReceived(Brewery _brewery)
         {
             // Update the Tempperature

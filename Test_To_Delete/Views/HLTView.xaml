@@ -6,6 +6,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:cmd="http://www.galasoft.ch/mvvmlight"
              xmlns:ignore="http://www.galasoft.ch/ignore"
+             xmlns:hp="clr-namespace:LAB.Helpers"
              xmlns:LAB="clr-namespace:LAB" 
              x:Class="LAB.Views.HLTView"
              mc:Ignorable="d ignore" 
@@ -14,6 +15,12 @@
     <UserControl.DataContext>
         <Binding Path="HLT" Source="{StaticResource Locator}"/>
     </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <hp:MouseButtonEventArgsToPointConverter x:Key="MouseButtonEventArgsToPointConverter"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
     <StackPanel Orientation="Horizontal">
         <Grid Width="228" Margin="40,14,0,-0.2">
@@ -39,11 +46,6 @@
                             <TranslateTransform/>
                         </TransformGroup>
                     </Path.RenderTransform>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="">
-                            <cmd:EventToCommand Command=""/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
                 </Path>
                 <Label x:Name="VolumeSetPointLabel" Content="{Binding Path=HLT_Volume_SetPoint}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="0,0,0,-10" Canvas.Right="210" Canvas.Bottom="{Binding Path=WaterHeightSetPoint}" FontSize="16" Foreground="White" HorizontalContentAlignment="Right" Visibility="{Binding HLT_SetPoint_Visibility, Mode=OneWay}"/>
             </Canvas>
@@ -165,7 +167,16 @@
                     <Rectangle Width="10" Height="{Binding Path=Thermo_Height}" Canvas.Left="6" Canvas.Bottom="19" Stretch="Fill" StrokeThickness="0" StrokeLineJoin="Round" Stroke="#FFFFFFFF" Fill="#FF9E0000"/>
                 </Canvas>
             </Viewbox>
-            <Path Width="28.1" Height="8.715" Canvas.Left="11.667" Canvas.Bottom="{Binding Path=Thermo_Height_SetPoint}" Visibility="{Binding Path=Thermo_SetPoint_Visibility}" Stretch="Fill" StrokeThickness="3" StrokeLineJoin="Round" Stroke="#FFE89E00" Fill="#FFE89E00" Data="F1 M 4.25043,9.30686L 50.358,9.28142L 54.2504,15.7188L 41.7477,9.5315L 53.8966,2.28121L 50.358,9.15642"/>
+            <Path x:Name="TempSetPointArrow" Width="28.1" Height="8.715" Canvas.Left="11.667" Canvas.Bottom="{Binding Path=Thermo_Height_SetPoint}" Visibility="{Binding Path=Thermo_SetPoint_Visibility}" Stretch="Fill" StrokeThickness="3" StrokeLineJoin="Round" Stroke="#FFE89E00" Fill="#FFE89E00" Data="F1 M 4.25043,9.30686L 50.358,9.28142L 54.2504,15.7188L 41.7477,9.5315L 53.8966,2.28121L 50.358,9.15642">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDown">
+                        <cmd:EventToCommand Command="{Binding TempSetPointClickCommand, Mode=OneWay}"
+                            EventArgsConverter="{StaticResource MouseButtonEventArgsToPointConverter}"
+                            EventArgsConverterParameter="{Binding ElementName=Layer_1_8}"
+                            PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Path>
             <Label x:Name="Thermo_SetPoint_Label" Content="{Binding Path=Thermo_SetPoint}" Canvas.Left="40" Canvas.Bottom="{Binding Path=Thermo_Height_SetPoint}" Margin="0,0,0,-11" FontSize="16" Foreground="White" Visibility="{Binding Path=Thermo_SetPoint_Visibility}"/>
         </Canvas>
 

@@ -147,6 +147,14 @@ namespace LAB.ViewModel
             }
         }
 
+        public BallValveViewModel BallValve
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<BallValveViewModel>();
+            }
+        }
+
         /// <summary>
         /// Cleans up all the resources.
         /// </summary>
