@@ -3,6 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:cmd="http://www.galasoft.ch/mvvmlight"
         xmlns:ignore="http://www.galasoft.ch/ignore"
         mc:Ignorable="d ignore"
        DataContext="{Binding Pump2, Source={StaticResource Locator}}" Height="65" Width="65">
@@ -16,6 +18,11 @@
                 <Ellipse Width="17.1663" Height="23.5781" Canvas.Left="41.4378" Canvas.Top="39.9838" Stretch="Fill" StrokeLineJoin="Round" Stroke="#FFFFFFFF" Fill="{Binding Path=PumpIsOnColor}" StrokeThickness="3"/>
                 <Path Width="50.7997" Height="23.57" Canvas.Left="0" Canvas.Top="39.9919" Stretch="Fill" StrokeLineJoin="Round" Stroke="#FFFFFFFF" Fill="{Binding Path=PumpIsOnColor}" Data="F1 M 50.2997,40.4919L 3.84476,40.4919C 1.9975,40.4919 0.5,42.5045 0.5,44.9872L 0.5,58.5666C 0.5,61.0493 1.9975,63.0619 3.84476,63.0619L 50.2997,63.0619" StrokeThickness="3"/>
                 <Path Width="0" Height="6.12274" Canvas.Left="52.6666" Canvas.Top="51.3337" Stretch="Fill" Data="F1 M 52.6666,57.4564L 52.6666,51.3337" StrokeThickness="3"/>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDown">
+                        <cmd:EventToCommand Command="{Binding Path=PumpClickCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
             </Canvas>
         </Viewbox>
     </Canvas>

@@ -26,8 +26,6 @@ namespace LAB.ViewModel
         public RelayCommand AutomaticModeClickCommand { get; private set; }
         public RelayCommand SemiAutoModeClickCommand { get; private set; }
         public RelayCommand ManualModeClickCommand { get; private set; }
-        public RelayCommand Pump1ClickCommand { get; private set; }
-        public RelayCommand Pump2ClickCommand { get; private set; }
 
         // Define Model instance names
         public BreweryCommands breweryCommand;
@@ -259,6 +257,7 @@ namespace LAB.ViewModel
             Messenger.Default.Register<Brewery>(this, "MLTTempSetPointReachedUpdate", MLTTempSetPointReachedUpdate_MessageReceived);
             Messenger.Default.Register<Brewery>(this, "BKTempSetPointReachedUpdate", BKTempSetPointReachedUpdate_MessageReceived);
             Messenger.Default.Register<Brewery.vessel>(this, "BurnerOverride", BurnerOverride_MessageReceived);
+            Messenger.Default.Register<Brewery.pump>(this, "PumpOverride", PumpOverride_MessageReceived);
         }
 
         #endregion
@@ -720,6 +719,7 @@ namespace LAB.ViewModel
         private void BurnerOverride_MessageReceived(Brewery.vessel Vessel)
         {
             if(brewery.AutomationMode != automationMode.Manual) { return; }
+            if(!process.Session.IsStarted) { return; }
             
             if(Vessel.Burner.IsOn)
             {
@@ -733,41 +733,31 @@ namespace LAB.ViewModel
 
         // Pump Control Commands
 
-        private void Pump1Control()
+        private void PumpOverride_MessageReceived(Brewery.pump pump)
         {
             if (brewery.AutomationMode != automationMode.Manual) { return; }
+            if (!process.Session.IsStarted) { return; }
 
-            if (brewery.Pump1.IsOn)
+            if (pump.IsOn)
             {
-                breweryCommand.ActivatePump1(RelayState.Off);
+                if(pump.Number == 1) { breweryCommand.ActivatePump1(RelayState.Off); }
+                if(pump.Number == 2) { breweryCommand.ActivatePump2(RelayState.Off); }
             }
             else
             {
-                breweryCommand.ActivatePump1(RelayState.On);
-            }
-        }
-
-        private void Pump2Control()
-        {
-            if (brewery.AutomationMode != automationMode.Manual) { return; }
-
-            if (brewery.Pump2.IsOn)
-            {
-                breweryCommand.ActivatePump2(RelayState.Off);
-            }
-            else
-            {
-                breweryCommand.ActivatePump2(RelayState.On);
+                if (pump.Number == 1) { breweryCommand.ActivatePump1(RelayState.On); }
+                if (pump.Number == 2) { breweryCommand.ActivatePump2(RelayState.On); }
             }
         }
 
         // Air pump Control Commands
 
-        private void AirPump1Control()
+        private void airPump1ClickCommand()
         {
             if(brewery.AutomationMode != automationMode.Manual) { return; }
+            if (!process.Session.IsStarted) { return; }
 
-            if(brewery.AirPump1.IsOn)
+            if (brewery.AirPump1.IsOn)
             {
                 breweryCommand.ActivateAirPump1(RelayState.Off);
             }
@@ -777,9 +767,10 @@ namespace LAB.ViewModel
             }
         }
 
-        private void AirPump2Control()
+        private void airPump2ClickCommand()
         {
             if (brewery.AutomationMode != automationMode.Manual) { return; }
+            if (!process.Session.IsStarted) { return; }
 
             if (brewery.AirPump2.IsOn)
             {
@@ -948,14 +939,18 @@ namespace LAB.ViewModel
                 return;
             }
 
-            // Verify Session Status
+            // Verify Session Status if started, stop session
             if (process.Session.IsStarted)
             {
+                // Stop data acquisition
                 process.Session.StartRequested = false;
                 process.Session.IsStarted = false;
                 RaisePropertyChanged(StartSessionButtonContentPropertyName);
                 UpdateTempSensorTimer.Stop();
                 UpdateVolSensorTimer.Stop();
+
+                // Reset all relays to off state
+                breweryCommand.SetPinModes();
                 return;
             }
 
@@ -991,11 +986,13 @@ namespace LAB.ViewModel
             if((brewery.AutomationMode == automationMode.Manual) || (brewery.AutomationMode == automationMode.SemiAuto))
             {
                 breweryState = BreweryState.Manual_Override;
+                RaisePropertyChanged(BreweryStateDisplayPropertyName);
                 return;
             }
 
             // Run state Machine
             breweryState = BreweryState.StandBy;
+            RaisePropertyChanged(BreweryStateDisplayPropertyName);
             RunAutoStateMachine();
         }
 

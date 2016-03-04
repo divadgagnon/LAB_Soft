@@ -16,5 +16,5 @@ D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Dele
 691413781528
 Debug Tools\DebugTool.xaml;MainWindow.xaml;Views\SidePanelView.xaml;Skins\MainSkin.xaml;Views\BKView.xaml;Views\ConnectionSetupWindow.xaml;Views\Dialogs\EditAnalogPinDialogView.xaml;Views\Dialogs\EditDigitalPinDialogView.xaml;Views\Dialogs\EditProbeColorsDialogView.xaml;Views\Dialogs\EditRefreshRateDialogView.xaml;Views\HardwareSetupWindow.xaml;Views\HLTView.xaml;Views\MLTView.xaml;Views\Pump1View.xaml;Views\Pump2View.xaml;Views\TimerView.xaml;Views\UserActionView.xaml;
 
-False
+True
 

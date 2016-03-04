@@ -149,8 +149,10 @@
             <Views:HLTView Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="4.8,0"/>
             <Views:MLTView Grid.Column="3" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="5,0,4.6,0"/>
             <Views:BKView Grid.Column="5" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="5,0,4.6,0"/>
-            <Views:Pump1View Grid.Column="2" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65" />
-            <Views:Pump2View Grid.Column="4" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65" />
+            <Views:Pump1View Grid.Column="2" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65" >
+            </Views:Pump1View>
+            <Views:Pump2View Grid.Column="4" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65">
+            </Views:Pump2View>
             <Views:UserActionView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,10"/>
 
             <GridSplitter Grid.Column="8" Width="5" Height="auto" HorizontalAlignment="Left" VerticalAlignment="Stretch" ResizeDirection="Columns" Grid.RowSpan="3"/>

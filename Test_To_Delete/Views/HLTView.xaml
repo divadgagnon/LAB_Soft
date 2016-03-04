@@ -39,6 +39,11 @@
                             <TranslateTransform/>
                         </TransformGroup>
                     </Path.RenderTransform>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="">
+                            <cmd:EventToCommand Command=""/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </Path>
                 <Label x:Name="VolumeSetPointLabel" Content="{Binding Path=HLT_Volume_SetPoint}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="0,0,0,-10" Canvas.Right="210" Canvas.Bottom="{Binding Path=WaterHeightSetPoint}" FontSize="16" Foreground="White" HorizontalContentAlignment="Right" Visibility="{Binding HLT_SetPoint_Visibility, Mode=OneWay}"/>
             </Canvas>

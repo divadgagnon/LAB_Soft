@@ -267,6 +267,9 @@ namespace LAB.Model
             AirPump1 = new pump();
             AirPump2 = new pump();
             AutomationMode = new automationMode();
+
+            Pump1.Number = 1;
+            Pump2.Number = 2;
         }
 
         public class vessel
@@ -308,6 +311,7 @@ namespace LAB.Model
 
         public class pump
         {
+            public int Number { get; set; }
             public bool IsOn { get; set; }
             public bool IsPrimed { get; set; }
             public bool IsPriming { get; set; }
