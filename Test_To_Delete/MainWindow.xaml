@@ -14,6 +14,7 @@
         Title="Lowis Automated Brewery"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
+        x:Name="MainUI"
         Background="{DynamicResource WindowBackground}">
 
     <Window.Resources>
@@ -58,7 +59,8 @@
                 <MenuItem Header="Export Session Report" Template="{DynamicResource MenuSubItem_LABSTYLE}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
-                            <cmd:EventToCommand Command=""/> <!-- À Implémenter -->
+                            <cmd:EventToCommand Command=""/>
+                            <!-- À Implémenter -->
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </MenuItem>
@@ -146,18 +148,41 @@
                 <ColumnDefinition Width="10*"/>
                 <ColumnDefinition Width="70*"/>
             </Grid.ColumnDefinitions>
-            <Views:HLTView Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="4.8,0" Loaded="HLTView_Loaded"/>
+            <Views:HLTView Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="4.8,0"/>
             <Views:MLTView Grid.Column="3" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="5,0,4.6,0"/>
             <Views:BKView Grid.Column="5" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="5,0,4.6,0"/>
-            <Views:Pump1View Grid.Column="2" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65" >
+            <Views:Pump1View Grid.Column="2" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65" >
             </Views:Pump1View>
-            <Views:Pump2View Grid.Column="4" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65">
+            <Views:Pump2View Grid.Column="4" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65">
             </Views:Pump2View>
+            <Viewbox Grid.Column="1" Grid.Row="1" Margin="93,9.636,129,27.364" Grid.RowSpan="1">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDown">
+                        <cmd:EventToCommand Command="{Binding ValveClickCommand}" CommandParameter="{Binding ValveList[0]}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Views:BallValveView x:Name="HLTout"/>
+            </Viewbox>
+            <Viewbox Grid.Column="3" Grid.Row="1" Margin="93,9.636,129,27.364" Grid.RowSpan="1">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDown">
+                        <cmd:EventToCommand Command="{Binding ValveClickCommand}" CommandParameter="{Binding ValveList[2]}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Views:BallValveView x:Name="MLTout"/>
+            </Viewbox>
+            <Viewbox Grid.Column="5" Grid.Row="1" Margin="93,9.636,129,27.364" Grid.RowSpan="1">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDown">
+                        <cmd:EventToCommand Command="{Binding ValveClickCommand}" CommandParameter="{Binding ValveList[5]}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Views:BallValveView x:Name="BKout"/>
+            </Viewbox>
             <Views:UserActionView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-
             <GridSplitter Grid.Column="8" Width="5" Height="auto" HorizontalAlignment="Left" VerticalAlignment="Stretch" ResizeDirection="Columns" Grid.RowSpan="3"/>
             <DockPanel x:Name="SidePanelContainer" Grid.Column="8" Grid.Row="0" Grid.RowSpan="3" DockPanel.Dock="Right">
-            <local:SidePanelView DockPanel.Dock="Top" 
+                <local:SidePanelView DockPanel.Dock="Top" 
                                  Height="auto" 
                                  BorderThickness="0" 
                                  Margin="0" 
@@ -165,13 +190,13 @@
                                  VerticalContentAlignment="Top" 
                                  VerticalAlignment="Stretch"
                                  Background="{DynamicResource MenuBackground}"/>
-            
-            <Views:TimerView DockPanel.Dock="Bottom" 
+
+                <Views:TimerView DockPanel.Dock="Bottom" 
                              VerticalAlignment="Stretch" 
                              VerticalContentAlignment="Bottom"
                              Margin="0" 
                              Background="{DynamicResource MenuBackground}"/>
-        </DockPanel>
+            </DockPanel>
         </Grid>
 
     </DockPanel>

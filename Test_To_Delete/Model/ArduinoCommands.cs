@@ -34,7 +34,7 @@ namespace LAB
             // Timer Setup
             device.DataPacketReceived += new EventHandler(device_DataPacketReceived);
             Error_Timer = new DispatcherTimer();
-            Error_Timer.Interval = TimeSpan.FromMilliseconds(2500);    // 2,5s timeout
+            Error_Timer.Interval = TimeSpan.FromMilliseconds(5000);    // 2,5s timeout
             Error_Timer.Tick += Error_Timer_Tick;
         }
         

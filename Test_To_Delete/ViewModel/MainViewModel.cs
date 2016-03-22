@@ -3,6 +3,7 @@ using LAB.Model;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using System;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Threading;
@@ -26,6 +27,7 @@ namespace LAB.ViewModel
         public RelayCommand AutomaticModeClickCommand { get; private set; }
         public RelayCommand SemiAutoModeClickCommand { get; private set; }
         public RelayCommand ManualModeClickCommand { get; private set; }
+        public RelayCommand<Brewery.valve> ValveClickCommand { get; private set; }
 
         // Define Model instance names
         public BreweryCommands breweryCommand;
@@ -178,6 +180,14 @@ namespace LAB.ViewModel
             }
         }
 
+        public ObservableCollection<Brewery.valve> ValveList
+        {
+            get
+            {
+                return brewery.Valves;
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -206,6 +216,7 @@ namespace LAB.ViewModel
             AutomaticModeClickCommand = new RelayCommand(automaticModeClickCommand);
             SemiAutoModeClickCommand = new RelayCommand(semiAutomaticModeClickCommand);
             ManualModeClickCommand = new RelayCommand(manualModeClickCommand);
+            ValveClickCommand = new RelayCommand<Brewery.valve>(valveClickCommand);
 
             // Initializing Timers
             UpdateTempSensorTimer = new DispatcherTimer();
@@ -1052,6 +1063,13 @@ namespace LAB.ViewModel
             automationModeChecked = new List<bool>(new bool[] { false, false, true });
             brewery.AutomationMode = automationMode.Manual;
             RaisePropertyChanged(AutomationModeCheckedPropertyName);
+        }
+
+        private void valveClickCommand(Brewery.valve _Valve)
+        {
+            if(_Valve == null) { throw new Exception("Valve Paramater was null"); }
+            brewery.Valves[_Valve.Number].IsOpen = !_Valve.IsOpen;
+            Messenger.Default.Send(brewery.Valves[_Valve.Number]);
         }
 
         // Gets executed before the application shuts down to close the comPort

@@ -85,7 +85,6 @@
     <Compile Include="SerialComm\PacketEncoder\Interfaces\IPacketEncoder.cs" />
     <Compile Include="SerialComm\PacketEncoder\SimplePacketProtocolPacketEncoder.cs" />
     <Compile Include="SerialComm\SerialPortData\SerialPortSettings.cs" />
-    <Compile Include="ViewModel\BallValveViewModel.cs" />
     <Compile Include="ViewModel\SidePanelViewModel.cs" />
     <Compile Include="ViewModel\TimerViewModel.cs" />
     <Compile Include="Views\BallValveView.xaml.cs">
@@ -160,8 +159,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\BallValveView.xaml">
-      <SubType>Form</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SidePanelView.xaml">
       <SubType>Form</SubType>

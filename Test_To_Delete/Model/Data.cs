@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -256,9 +257,11 @@ namespace LAB.Model
         public pump AirPump1 { get; set; }
         public pump AirPump2 { get; set; }
         public automationMode AutomationMode { get; set; } = automationMode.Automatic;
+        public ObservableCollection<valve> Valves { get; set; }
 
         public Brewery()
         {
+            // Create Class instances
             HLT = new vessel(Vessels.HLT);
             MLT = new vessel(Vessels.MLT);
             BK = new vessel(Vessels.BK);
@@ -267,6 +270,15 @@ namespace LAB.Model
             AirPump1 = new pump();
             AirPump2 = new pump();
             AutomationMode = new automationMode();
+
+            // Create Valve List
+            Valves = new ObservableCollection<valve>();
+            Valves.Add(new valve() { Name = "HLTout", Number = 0 });
+            Valves.Add(new valve() { Name = "MLTin", Number = 1 });
+            Valves.Add(new valve() { Name = "MLTout", Number = 2 });
+            Valves.Add(new valve() { Name = "MLTreturn", Number = 3 });
+            Valves.Add(new valve() { Name = "BKin", Number = 4 });
+            Valves.Add(new valve() { Name = "BKout", Number = 5 });
 
             Pump1.Number = 1;
             Pump2.Number = 2;
@@ -319,6 +331,8 @@ namespace LAB.Model
 
         public class valve
         {
+            public string Name { get; set; }
+            public int Number { get; set; }
             public bool IsOpen { get; set; }
             public request Request { get; set; }
             
@@ -333,6 +347,7 @@ namespace LAB.Model
                 public bool Close { get; set; }
             }
         }
+        
     }
 
     public class UserAlarm
@@ -361,6 +376,16 @@ namespace LAB.Model
         HLT,
         MLT,
         BK,
+    }
+
+    public enum ValveList
+    {
+        HLTout = 0,
+        MLTin = 1,
+        MLTout = 2,
+        MLTreturn = 3,
+        BKin = 4,
+        BKout = 5,
     }
 
     public enum BreweryState
