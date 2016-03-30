@@ -12,7 +12,7 @@
          <Members>
           <Member Name="#.ctor()" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
            <Messages>
-            <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Status="Active" Created="2016-03-22 12:30:30Z" FixCategory="NonBreaking">
+            <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Status="Active" Created="2016-03-30 04:06:02Z" FixCategory="NonBreaking">
              <Issue Certainty="95" Level="CriticalWarning" Path="D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\ViewModel" File="HardwareSetupViewModel.cs" Line="36">'HardwareSetupViewModel.HardwareSetupViewModel()' contient une chaîne d'appel aboutissant à un appel vers une méthode virtuelle définie par la classe. Vérifiez le parcours de pile suivant et analysez-y toutes les conséquences imprévisibles : &#xD;&#xA;&#xD;&#xA;HardwareSetupViewModel..ctor()&#xD;&#xA;HardwareSetupViewModel.set_DigitalPins(List&lt;Int32&gt;):Void&#xD;&#xA;ObservableObject.RaisePropertyChanged(String):Void</Issue>
             </Message>
            </Messages>
@@ -23,7 +23,7 @@
          <Members>
           <Member Name="#.ctor()" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
            <Messages>
-            <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Status="Active" Created="2016-03-22 12:30:30Z" FixCategory="NonBreaking">
+            <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Status="Active" Created="2016-03-30 04:06:02Z" FixCategory="NonBreaking">
              <Issue Certainty="95" Level="CriticalWarning" Path="D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\ViewModel" File="MainViewModel.cs" Line="98">'MainViewModel.MainViewModel()' contient une chaîne d'appel aboutissant à un appel vers une méthode virtuelle définie par la classe. Vérifiez le parcours de pile suivant et analysez-y toutes les conséquences imprévisibles : &#xD;&#xA;&#xD;&#xA;MainViewModel..ctor()&#xD;&#xA;ObservableObject.RaisePropertyChanged(String):Void</Issue>
             </Message>
            </Messages>

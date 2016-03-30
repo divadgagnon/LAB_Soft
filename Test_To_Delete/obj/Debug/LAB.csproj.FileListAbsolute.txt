@@ -252,3 +252,9 @@ D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Dele
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\LAB.csproj.GenerateResource.Cache
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BallValveView.baml
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BallValveView.g.cs
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\HLToutPipeView.baml
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\HLToutPipeView.g.cs
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLTinPipeView.baml
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLTinPipeView.g.cs
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLToutPipeView.baml
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLToutPipeView.g.cs

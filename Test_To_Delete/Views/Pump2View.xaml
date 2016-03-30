@@ -9,8 +9,8 @@
         mc:Ignorable="d ignore"
        DataContext="{Binding Pump2, Source={StaticResource Locator}}" Height="65" Width="65">
 
-    <Canvas xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="Layer_1_3" Width="105" Height="105" Canvas.Left="0" Canvas.Top="0">
-        <Viewbox Width="55" Height="59" Canvas.Left="3" Canvas.Top="3">
+    <Canvas xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="Layer_1_3" Width="Auto" Height="auto" Canvas.Left="0" Canvas.Top="0">
+        <Viewbox Width="65" Height="65" Canvas.Left="0" Canvas.Top="0">
             <Canvas Width="86" Height="91.0619">
                 <Path Width="71.8333" Height="13.2292" Canvas.Left="13.1667" Canvas.Top="77.8327" Stretch="Fill" StrokeLineJoin="Round" Stroke="#FFFFFFFF" Fill="{Binding Path=PumpIsOnColor}" Data="F1 M 16.6667,78.3327L 81.5,78.3327C 83.1568,78.3327 84.5,79.6759 84.5,81.3327L 84.5,87.5619C 84.5,89.2188 83.1568,90.5619 81.5,90.5619L 16.6667,90.5619C 15.0098,90.5619 13.6667,89.2188 13.6667,87.5619L 13.6667,81.3327C 13.6667,79.6759 15.0098,78.3327 16.6667,78.3327 Z " StrokeThickness="3"/>
                 <Path Width="22.0207" Height="49.6664" Canvas.Left="63.6458" Canvas.Top="0" Stretch="Fill" StrokeLineJoin="Round" Stroke="#FFFFFFFF" Fill="{Binding Path=PumpIsOnColor}" Data="F1 M 67.1458,49.1664L 82.1665,49.1664C 83.8234,49.1664 85.1665,47.8232 85.1665,46.1664L 85.1665,3.5C 85.1665,1.84315 83.8234,0.5 82.1665,0.5L 67.1458,0.5C 65.489,0.5 64.1458,1.84315 64.1458,3.5L 64.1458,46.1664C 64.1458,47.8232 65.489,49.1664 67.1458,49.1664 Z " StrokeThickness="3"/>

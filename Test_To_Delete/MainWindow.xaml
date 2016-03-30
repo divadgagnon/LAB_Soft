@@ -148,14 +148,20 @@
                 <ColumnDefinition Width="10*"/>
                 <ColumnDefinition Width="70*"/>
             </Grid.ColumnDefinitions>
-            <Views:HLTView Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="4.8,0"/>
-            <Views:MLTView Grid.Column="3" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="5,0,4.6,0"/>
-            <Views:BKView Grid.Column="5" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" Height="406" Width="352" Margin="5,0,4.6,0"/>
-            <Views:Pump1View Grid.Column="2" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65" >
+            <Views:HLTView Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="406" Width="352" Margin="4.8,0"/>
+            <Views:MLTView Grid.Column="3" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="406" Width="352" Margin="5,0,4.6,0" Panel.ZIndex="1000"/>
+            <Views:BKView Grid.Column="5" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="406" Width="352" Margin="5,0,4.6,0"/>
+
+            <Views:HLToutPipeView x:Name="HLToutPipe" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="152,430,50,20"/>
+            <Views:MLTinPipeView x:Name="MLTinPipe" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="47,70,250,55"/>
+            <Views:MLToutPipeView x:Name="MLToutPipe" Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="152,430,50,19"/>
+
+
+            <Views:Pump1View Grid.Column="2" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="65" Height="65">
             </Views:Pump1View>
-            <Views:Pump2View Grid.Column="4" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="65" Height="65">
+            <Views:Pump2View Grid.Column="4" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="65" Height="65">
             </Views:Pump2View>
-            <Viewbox Grid.Column="1" Grid.Row="1" Margin="93,9.636,129,27.364" Grid.RowSpan="1">
+            <Viewbox Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="120,400,0,0" Height="60">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDown">
                         <cmd:EventToCommand Command="{Binding ValveClickCommand}" CommandParameter="{Binding ValveList[0]}"/>
@@ -163,7 +169,15 @@
                 </i:Interaction.Triggers>
                 <Views:BallValveView x:Name="HLTout"/>
             </Viewbox>
-            <Viewbox Grid.Column="3" Grid.Row="1" Margin="93,9.636,129,27.364" Grid.RowSpan="1">
+            <Viewbox Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15,0,0,80" Height="60" Grid.ColumnSpan="2">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDown">
+                        <cmd:EventToCommand Command="{Binding ValveClickCommand}" CommandParameter="{Binding ValveList[1]}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Views:BallValveView x:Name="MLTin"/>
+            </Viewbox>
+            <Viewbox Grid.Column="3" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="120,400,0,0" Height="60" Width="80">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDown">
                         <cmd:EventToCommand Command="{Binding ValveClickCommand}" CommandParameter="{Binding ValveList[2]}"/>
@@ -171,7 +185,23 @@
                 </i:Interaction.Triggers>
                 <Views:BallValveView x:Name="MLTout"/>
             </Viewbox>
-            <Viewbox Grid.Column="5" Grid.Row="1" Margin="93,9.636,129,27.364" Grid.RowSpan="1">
+            <Viewbox Grid.Column="4" Grid.Row="1" Height="60" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15,0,0,80">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDown">
+                        <cmd:EventToCommand Command="{Binding ValveClickCommand}" CommandParameter="{Binding ValveList[3]}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Views:BallValveView x:Name="MLTreturn"/>
+            </Viewbox>
+            <Viewbox Grid.Column="4" Grid.Row="1" Height="60" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="90,0,0,80" Grid.ColumnSpan="2">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDown">
+                        <cmd:EventToCommand Command="{Binding ValveClickCommand}" CommandParameter="{Binding ValveList[4]}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Views:BallValveView x:Name="BKin"/>
+            </Viewbox>
+            <Viewbox Grid.Column="5" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="120,400,0,0" Height="60">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDown">
                         <cmd:EventToCommand Command="{Binding ValveClickCommand}" CommandParameter="{Binding ValveList[5]}"/>
@@ -196,6 +226,9 @@
                              VerticalContentAlignment="Bottom"
                              Margin="0" 
                              Background="{DynamicResource MenuBackground}"/>
+            </DockPanel>
+            <DockPanel x:Name="ProcessPlotContainer" Grid.Row="2" Grid.ColumnSpan="7" Background="{DynamicResource MenuBackground}" Margin="0,35,-10,0">
+
             </DockPanel>
         </Grid>
 

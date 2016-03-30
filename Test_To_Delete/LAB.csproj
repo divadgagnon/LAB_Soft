@@ -90,6 +90,12 @@
     <Compile Include="Views\BallValveView.xaml.cs">
       <DependentUpon>BallValveView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\MLToutPipeView.xaml.cs">
+      <DependentUpon>MLToutPipeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MLTinPipeView.xaml.cs">
+      <DependentUpon>MLTinPipeView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SidePanelView.xaml.cs">
       <DependentUpon>SidePanelView.xaml</DependentUpon>
     </Compile>
@@ -142,6 +148,9 @@
     <Compile Include="Views\UserActionView.xaml.cs">
       <DependentUpon>UserActionView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\HLToutPipeView.xaml.cs">
+      <DependentUpon>HLToutPipeView.xaml</DependentUpon>
+    </Compile>
     <Page Include="Debug Tools\DebugTool.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -161,6 +170,14 @@
     <Page Include="Views\BallValveView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\MLToutPipeView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\MLTinPipeView.xaml">
+      <SubType>Form</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SidePanelView.xaml">
       <SubType>Form</SubType>
@@ -220,6 +237,10 @@
     </Page>
     <Page Include="Views\UserActionView.xaml">
       <SubType>Form</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\HLToutPipeView.xaml">
+      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

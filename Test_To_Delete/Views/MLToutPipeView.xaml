@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="LAB.Views.MLToutPipeView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ignore="http://www.galasoft.ch/ignore"
+        mc:Ignorable="d ignore">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LAB_V2;component/Skins/MainSkin.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+        <Grid>
+            <Rectangle x:Name="MLToutVertical" Stroke="White" StrokeThickness="1" Width="18" Height="1000" Fill="{StaticResource MenuBackground }" HorizontalAlignment="Left" Margin="0,0,0,0"/>
+            <Rectangle x:Name="BorderHider" VerticalAlignment="Bottom" Fill="{Binding ElementName=MLToutVertical, Path=Fill}" Height="5" Width="16" HorizontalAlignment="Left" Margin="1,0,0,15" Panel.ZIndex="1000"/>
+            <Rectangle x:Name="MLToutHorizontal" VerticalAlignment="Bottom" Stroke="White" StrokeThickness="1" Width="1000" Height="18" Fill="{StaticResource MenuBackground}" Margin="0,0,0,0"/>
+        </Grid>
+
+</UserControl>
