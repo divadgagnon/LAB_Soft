@@ -1,5 +1,7 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
+using System.Windows.Media;
+using GalaSoft.MvvmLight.Messaging;
+using LAB.Model;
 
 namespace LAB.Views
 {
@@ -8,12 +10,27 @@ namespace LAB.Views
     /// </summary>
     public partial class MLToutPipeView : UserControl
     {
-        /// <summary>
-        /// Initializes a new instance of the WaterPipeView class.
-        /// </summary>
+        private SolidColorBrush WaterColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF1976CD"));
+        private SolidColorBrush TransparentBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0000"));
+
         public MLToutPipeView()
         {
             InitializeComponent();
+            Messenger.Default.Register<Brewery.valve>(this, ValveUpdate_MessageReceived);
+        }
+
+        private void ValveUpdate_MessageReceived(Brewery.valve Valve)
+        {
+            if (Valve.Name != "MLTout") { return; }
+
+            if (Valve.IsOpen)
+            {
+                Water.Fill = WaterColor;
+            }
+            else
+            {
+                Water.Fill = TransparentBrush;
+            }
         }
     }
 }

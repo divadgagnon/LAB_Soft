@@ -14,9 +14,11 @@
         </ResourceDictionary>
     </UserControl.Resources>
     
-    <StackPanel>
-        <Rectangle x:Name="MLTinHorizontal" Stroke="White" StrokeThickness="1" Height="18" Width="1000" Fill="{StaticResource MenuBackground}"/>
-        <Rectangle x:Name="BorderHider" Fill="{Binding ElementName=MLTinHorizontal, Path=Fill}" Height="5" Width="16" HorizontalAlignment="Left" Margin="1,-2,0,-2.5" Panel.ZIndex="1000"/>
-        <Rectangle x:Name="MLTinVertical" Stroke="White" StrokeThickness="1" Width="18" Height="1000" Fill="{StaticResource MenuBackground }" HorizontalAlignment="Left" Margin="0,0,0,-2.5"/>
-    </StackPanel>
+    <Grid>
+        <Rectangle x:Name="MLTinHorizontal" Stroke="White" StrokeThickness="1" Height="18" Width="1000" Fill="{StaticResource MenuBackground}" VerticalAlignment="Top"/>
+        <Rectangle x:Name="BorderHider" Fill="{Binding ElementName=MLTinHorizontal, Path=Fill}" Height="5" Width="16" HorizontalAlignment="Left" Margin="1,16,0,0" VerticalAlignment="Top" Panel.ZIndex="1000"/>
+        <Rectangle x:Name="MLTinVertical" Stroke="White" StrokeThickness="1" Width="18" Height="1000" Fill="{StaticResource MenuBackground }" HorizontalAlignment="Left" Margin="0,17,0,0"/>
+        <Rectangle x:Name="Water" Fill="#0000" Margin="1,1,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="1000" Height="16" Opacity="0.3" Panel.ZIndex="2000"/>
+        <Rectangle x:Name="WaterVertical" Fill="{Binding ElementName=Water, Path=Fill}" Opacity="0.3" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="1,17,0,0" Height="1000" Width="16" Panel.ZIndex="2000"/>
+    </Grid>
 </UserControl>

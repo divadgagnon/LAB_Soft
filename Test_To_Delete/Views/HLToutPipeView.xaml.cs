@@ -10,8 +10,8 @@ namespace LAB.Views
     /// </summary>
     public partial class HLToutPipeView : UserControl
     {
-        private SolidColorBrush Water = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF1976CD"));
-        private SolidColorBrush MenuBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF333333"));
+        private SolidColorBrush WaterColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF1976CD"));
+        private SolidColorBrush TransparentBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0000"));
 
 
         public HLToutPipeView()
@@ -26,19 +26,11 @@ namespace LAB.Views
 
             if(Valve.IsOpen)
             {
-                HLToutHorizontal.Fill = Water;
-                HLToutHorizontal.Opacity = 0.3;
-
-                HLToutVertical.Fill = Water;
-                HLToutVertical.Opacity = 0.3;
+                Water.Fill = WaterColor;
             }
             else
             {
-                HLToutVertical.Fill = MenuBackground;
-                HLToutVertical.Opacity = 1;
-
-                HLToutHorizontal.Fill = MenuBackground;
-                HLToutHorizontal.Opacity = 1;
+                Water.Fill = TransparentBrush;
             }
         }
     }

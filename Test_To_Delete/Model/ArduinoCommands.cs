@@ -34,7 +34,7 @@ namespace LAB
             // Timer Setup
             device.DataPacketReceived += new EventHandler(device_DataPacketReceived);
             Error_Timer = new DispatcherTimer();
-            Error_Timer.Interval = TimeSpan.FromMilliseconds(5000);    // 2,5s timeout
+            Error_Timer.Interval = TimeSpan.FromMilliseconds(1500);    // 1,5s timeout
             Error_Timer.Tick += Error_Timer_Tick;
         }
         
@@ -214,8 +214,6 @@ namespace LAB
                     break;
                 }
             }
-            // Run stateMachine in view model?
-
         }
 
  # endregion
@@ -294,7 +292,7 @@ namespace LAB
                             probes.YellowOrange.IsConnected = true;
                             break;
                         }
-                    case 0x5A:
+                    case 0xA5:
                         {
                             //Probe Orange
                             probes.Orange.IsConnected = true;
@@ -323,9 +321,9 @@ namespace LAB
         {
             Error_Timer.Stop();
             Probes probes = new Probes();
-            int NbOfProbes = (int)Packet.Count() - 1;
+            int PacketLength = (int)Packet.Count() - 1;
 
-            for (int i = 1; i <= NbOfProbes; i+=2)
+            for (int i = 1; i <= PacketLength; i+=2)
             {
                 switch (Packet[i])
                 {
@@ -341,7 +339,7 @@ namespace LAB
                             probes.YellowOrange.Temp = (double)Packet[i + 1] * 0.46875;
                             break;
                         }
-                    case 0x5A:
+                    case 0xA5:
                         {
                             //Probe Orange
                             probes.Orange.Temp = (double)Packet[i + 1] * 0.46875;
