@@ -150,12 +150,14 @@
             </Grid.ColumnDefinitions>
             <Views:HLTView Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="406" Width="352" Margin="4.8,0"/>
             <Views:MLTView Grid.Column="3" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="406" Width="352" Margin="5,0,4.6,0" Panel.ZIndex="1000"/>
-            <Views:BKView Grid.Column="5" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="406" Width="352" Margin="5,0,4.6,0"/>
+            <Views:BKView Grid.Column="5" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="406" Width="352" Margin="5,0,4.6,0" Panel.ZIndex="1000"/>
 
             <Views:HLToutPipeView x:Name="HLToutPipe" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="152,430,50,20"/>
             <Views:MLTinPipeView x:Name="MLTinPipe" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="47,70,250,55"/>
             <Views:MLToutPipeView x:Name="MLToutPipe" Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="152,430,50,19"/>
             <Views:WaterManifoldView x:Name="ManifoldPipe" Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="46.5,480,0,39" Height="100" Width="103"/>
+            <Views:MLTreturnPipeView x:Name="MLTreturnPipe" Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="200,30,48,100" Width="auto" Height="auto"/>
+            <Views:BKinPipeView x:Name="BKinPipe" Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="auto" Height="auto" Margin="122,30,275,100" />
 
             <Views:Pump1View Grid.Column="2" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="65" Height="65">
             </Views:Pump1View>

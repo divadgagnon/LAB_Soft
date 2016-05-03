@@ -68,5 +68,10 @@ namespace LAB
                 }
             }
         }
+
+        private void MLTreturnPipe_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

@@ -262,3 +262,5 @@ D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Dele
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\WaterManifoldView.g.cs
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLTreturnPipeView.baml
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLTreturnPipeView.g.cs
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BKinPipeView.baml
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BKinPipeView.g.cs

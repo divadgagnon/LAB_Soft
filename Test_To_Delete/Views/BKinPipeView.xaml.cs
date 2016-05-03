@@ -5,13 +5,16 @@ using LAB.Model;
 
 namespace LAB.Views
 {
-
-    public partial class MLTreturnPipeView : UserControl
+    /// <summary>
+    /// Description for BKinPipeView.
+    /// </summary>
+    public partial class BKinPipeView : UserControl
     {
         private SolidColorBrush WaterColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF1976CD"));
         private SolidColorBrush TransparentBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0000"));
 
-        public MLTreturnPipeView()
+
+        public BKinPipeView()
         {
             InitializeComponent();
             Messenger.Default.Register<Brewery.valve>(this, ValveUpdate_MessageReceived);
@@ -19,7 +22,7 @@ namespace LAB.Views
 
         private void ValveUpdate_MessageReceived(Brewery.valve Valve)
         {
-            if (Valve.Name != "MLTreturn") { return; }
+            if (Valve.Name != "BKin") { return; }
 
             if (Valve.IsOpen)
             {

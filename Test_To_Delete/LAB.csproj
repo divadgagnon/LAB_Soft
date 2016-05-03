@@ -85,8 +85,11 @@
     <Compile Include="SerialComm\PacketEncoder\Interfaces\IPacketEncoder.cs" />
     <Compile Include="SerialComm\PacketEncoder\SimplePacketProtocolPacketEncoder.cs" />
     <Compile Include="SerialComm\SerialPortData\SerialPortSettings.cs" />
-    <Compile Include="Views\MLTreturnPipeView.xaml.cs">
-      <DependentUpon>MLTreturnPipeView.xaml</DependentUpon>
+    <Compile Include="Views\BKinPipeView.xaml.cs">
+      <DependentUpon>BKinPipeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MLTReturnPipeView.xaml.cs">
+      <DependentUpon>MLTReturnPipeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\SidePanelViewModel.cs" />
     <Compile Include="ViewModel\TimerViewModel.cs" />
@@ -173,8 +176,12 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\MLTreturnPipeView.xaml">
+    <Page Include="Views\BKinPipeView.xaml">
       <SubType>Form</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MLTReturnPipeView.xaml">
+      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\BallValveView.xaml">
