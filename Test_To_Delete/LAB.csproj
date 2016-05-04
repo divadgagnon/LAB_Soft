@@ -283,6 +283,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Firmware\LAB_V2_Firmware.ino" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -304,7 +305,7 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Burner Flames.png" />
+    <Resource Include="Media\Burner Flames.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Data\DefaultHardwareSettings.xml">
