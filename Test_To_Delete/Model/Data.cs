@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace LAB.Model
 {
@@ -258,6 +259,7 @@ namespace LAB.Model
         public pump AirPump2 { get; set; }
         public automationMode AutomationMode { get; set; } = automationMode.Automatic;
         public ObservableCollection<valve> Valves { get; set; }
+        public valveConfig ValveConfig { get; set; }
 
         public Brewery()
         {
@@ -270,6 +272,8 @@ namespace LAB.Model
             AirPump1 = new pump();
             AirPump2 = new pump();
             AutomationMode = new automationMode();
+            ValveConfig = new valveConfig();
+            ValveConfig.ConfigSet = ValveConfigs.AllOff;
 
             // Create Valve List
             Valves = new ObservableCollection<valve>();
@@ -347,6 +351,104 @@ namespace LAB.Model
                 public bool Close { get; set; }
             }
         }
+
+        public class valveConfig
+        {
+            public ValveConfigs ConfigSet
+            {
+                get;
+                set;
+            }
+
+            public bool Check(ValveConfigs Config, ObservableCollection<valve> Valves)
+            {
+                switch(Config)
+                {
+                    case ValveConfigs.Strike_Transfer:
+                        {
+                            // Cancel the requests and update the UI
+                            if(Valves[0].IsOpen)
+                            {
+                                Valves[0].Request.Open = false;
+                                Messenger.Default.Send(Valves[0]);
+                            }
+
+                            if(Valves[1].IsOpen)
+                            {
+                                Valves[1].Request.Open = false;
+                                Messenger.Default.Send(Valves[1]);
+                            }
+
+                            if(!Valves[2].IsOpen)
+                            {
+                                Valves[2].Request.Close = false;
+                                Messenger.Default.Send(Valves[2]);
+                            }
+
+                            if (Valves[0].IsOpen && Valves[1].IsOpen && !Valves[2].IsOpen) { return true; }
+                            else { return false; }
+                        }
+
+                    case ValveConfigs.Mash_Recirc:
+                        {
+                            // Cancel the requests
+                            if(Valves[2].IsOpen)
+                            {
+                                Valves[2].Request.Open = false;
+                                Messenger.Default.Send(Valves[2]);
+                            }
+
+                            if(Valves[3].IsOpen)
+                            {
+                                Valves[3].Request.Open = false;
+                                Messenger.Default.Send(Valves[3]);
+                            }
+
+                            if(Valves[2].IsOpen && Valves[3].IsOpen) { return true; }
+                            else { return false; }
+                        }
+
+                    default:
+                        {
+                            return false;
+                        }
+                }
+            }
+
+            public void Set(ValveConfigs Config, ObservableCollection<valve> Valves)
+            {
+                switch(Config)
+                {
+                    case ValveConfigs.Strike_Transfer:
+                        {
+                            // Set the resquests
+                            if (!Valves[0].IsOpen) { Valves[0].Request.Open = true; }
+                            if (!Valves[1].IsOpen) { Valves[1].Request.Open = true; }
+                            if (Valves[2].IsOpen) { Valves[2].Request.Close = true; }
+
+                            // Update the UI
+                            Messenger.Default.Send(Valves[0]);
+                            Messenger.Default.Send(Valves[1]);
+                            Messenger.Default.Send(Valves[2]);
+
+                            break;
+                        }
+
+                    case ValveConfigs.Mash_Recirc:
+                        {
+                            // Set the resquests
+                            if (!Valves[2].IsOpen) { Valves[2].Request.Open = true; }
+                            if(!Valves[3].IsOpen) { Valves[3].Request.Open = true; }
+
+                            // Update the UI
+                            Messenger.Default.Send(Valves[2]);
+                            Messenger.Default.Send(Valves[3]);
+
+                            break;
+                        }
+                }
+            }
+        }
         
     }
 
@@ -386,6 +488,15 @@ namespace LAB.Model
         MLTreturn = 3,
         BKin = 4,
         BKout = 5,
+    }
+
+    public enum ValveConfigs
+    {
+        AllOff,
+        Strike_Transfer,
+        Mash_Recirc,
+        Fly_Sparge,
+        Boil,
     }
 
     public enum BreweryState

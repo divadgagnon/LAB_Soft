@@ -188,8 +188,6 @@ C:\Users\utilisateur\Desktop\David\Visual Studio 2013\Projects\Test_To_Delete\Te
 C:\Users\utilisateur\Desktop\David\Visual Studio 2013\Projects\Test_To_Delete\Test_To_Delete\obj\Debug\LAB.Properties.Resources.resources
 C:\Users\utilisateur\Desktop\David\Visual Studio 2013\Projects\Test_To_Delete\Test_To_Delete\obj\Debug\LAB.csproj.GenerateResource.Cache
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\bin\Debug\LAB_V2.exe.config
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\LAB_V2.exe
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\LAB_V2.pdb
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\bin\Debug\LAB_V2.exe
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\bin\Debug\LAB_V2.pdb
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\bin\Debug\LAB_V2.exe.CodeAnalysisLog.xml
@@ -208,6 +206,11 @@ D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Dele
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\bin\Debug\Microsoft.Practices.ServiceLocation.pdb
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\bin\Debug\Microsoft.Practices.ServiceLocation.xml
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\LAB.csprojResolveAssemblyReference.cache
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BKinPipeView.baml
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLTReturnPipeView.baml
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BallValveView.baml
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLToutPipeView.baml
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLTinPipeView.baml
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\SidePanelView.baml
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Skins\MainSkin.baml
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BKView.baml
@@ -222,8 +225,15 @@ D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Dele
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\Pump2View.baml
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\TimerView.baml
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\UserActionView.baml
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\HLToutPipeView.baml
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\WaterManifoldView.baml
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Debug Tools\DebugTool.g.cs
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\MainWindow.g.cs
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BKinPipeView.g.cs
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLTReturnPipeView.g.cs
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BallValveView.g.cs
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLToutPipeView.g.cs
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLTinPipeView.g.cs
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\SidePanelView.g.cs
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BKView.g.cs
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\ConnectionSetupWindow.g.cs
@@ -238,6 +248,8 @@ D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Dele
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\Pump2View.g.cs
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\TimerView.g.cs
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\UserActionView.g.cs
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\HLToutPipeView.g.cs
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\WaterManifoldView.g.cs
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\App.g.cs
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\LAB_V2_Content.g.cs
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\GeneratedInternalTypeHelper.g.cs
@@ -250,17 +262,5 @@ D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Dele
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\LAB_V2.g.resources
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\LAB.Properties.Resources.resources
 D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\LAB.csproj.GenerateResource.Cache
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BallValveView.baml
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BallValveView.g.cs
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\HLToutPipeView.baml
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\HLToutPipeView.g.cs
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLTinPipeView.baml
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLTinPipeView.g.cs
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLToutPipeView.baml
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLToutPipeView.g.cs
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\WaterManifoldView.baml
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\WaterManifoldView.g.cs
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLTreturnPipeView.baml
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\MLTreturnPipeView.g.cs
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BKinPipeView.baml
-D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\Views\BKinPipeView.g.cs
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\LAB_V2.exe
+D:\David\Projets\Bière\Automated Brewery Concept\Software\LAB_Soft\Test_To_Delete\obj\Debug\LAB_V2.pdb

@@ -208,18 +208,18 @@
         delay(50);
         byte OutBuffer[NumberOfDevices*2+1];
         OutBuffer[0] = 0x07;
-		j = 0;
+		int j = 0;
         
-        for(int i=0;i<NumberOfDevices; i+=2)
+        for(int i=0;i<NumberOfDevices*2; i+=2)
         {
             // Search the wire for address
-            if(sensors.getAddress(TempAddress, j))		// It responds almost immediately. Let's print out the data
+            if(sensors.getAddress(TempAddress, j))
    			{
                byte TempData = round(sensors.getTempC(TempAddress)/0.46875);
                OutBuffer[i+1] = TempAddress[7];
                OutBuffer[i+2] = TempData;
-			   j++;
-            } 
+			   j+=1;
+            }
          }
          
          SendPacket(OutBuffer, sizeof(OutBuffer));

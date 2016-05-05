@@ -269,6 +269,7 @@ namespace LAB.ViewModel
             Messenger.Default.Register<Brewery>(this, "BKTempSetPointReachedUpdate", BKTempSetPointReachedUpdate_MessageReceived);
             Messenger.Default.Register<Brewery.vessel>(this, "BurnerOverride", BurnerOverride_MessageReceived);
             Messenger.Default.Register<Brewery.pump>(this, "PumpOverride", PumpOverride_MessageReceived);
+            Messenger.Default.Register<ObservableCollection<Brewery.valve>>(this, ValveUpdate_MessageReceived);
         }
 
         #endregion
@@ -294,13 +295,13 @@ namespace LAB.ViewModel
                             Messenger.Default.Send<Brewery>(brewery, "HLTTempSetPointUpdate");
                             Messenger.Default.Send<Brewery>(brewery, "HLTTempSetPointReachedUpdate");
 
-                            if(!userAlarm.MessageSent) { PlayAlarm("", false, true, true); }
-                            if(userAlarm.ProceedIsPressed)
-                            {
+                            //if(!userAlarm.MessageSent) { PlayAlarm("", false, true, true); }
+                            //if(userAlarm.ProceedIsPressed)
+                            //{
                                 breweryState = BreweryState.HLT_Fill;
                                 RaisePropertyChanged(BreweryStateDisplayPropertyName);
                                 userAlarm = new UserAlarm();
-                            }
+                            //}
                         }
                         break;
                     }
@@ -308,7 +309,7 @@ namespace LAB.ViewModel
                 case BreweryState.HLT_Fill:
                     {
                         // Send User Alarm message to update the UserAction display text
-                        if(!userAlarm.MessageSent) { PlayAlarm("", false, false, true); }
+                        //if(!userAlarm.MessageSent) { PlayAlarm("", false, false, true); }
 
                         // Set the fill set point and send the data to the HLT view
                         brewery.HLT.Volume.SetPoint = process.Session.TotalWaterNeeded;
@@ -339,14 +340,14 @@ namespace LAB.ViewModel
                 case BreweryState.Strike_Heat:
                     {
                         // Send Message to light the pilots
-                        if (!userAlarm.MessageSent) { PlayAlarm("Pilot", true, true, true); }
+                        //if (!userAlarm.MessageSent) { PlayAlarm("Pilot", true, true, true); }
 
                         // Check for user confirmation of pilots
-                        if(userAlarm.ProceedIsPressed)
-                        {
+                        //if(userAlarm.ProceedIsPressed)
+                        //{
                             // Get to HLT Set point and Hold
                             breweryCommand.HoldTemp(Vessels.HLT, process.Strike.Temp);
-                        }
+                        //}
 
                         // Check if temperature range is reached
                         if (brewery.HLT.Temp.SetPointReached)
@@ -369,13 +370,18 @@ namespace LAB.ViewModel
                         Messenger.Default.Send<Brewery>(brewery, "MLTVolumeSetPointReachedUpdate");
 
                         // Confirm the correct Valves operations are complete before starting the pump
-                        if (!userAlarm.MessageSent) { PlayAlarm("Valves", true, true, true); }
-
+                        //if (!userAlarm.MessageSent) { PlayAlarm("Valves", true, true, true); }
+                        if (!(brewery.ValveConfig.ConfigSet == ValveConfigs.Strike_Transfer))
+                        {
+                            brewery.ValveConfig.Set(ValveConfigs.Strike_Transfer, brewery.Valves);
+                            brewery.ValveConfig.ConfigSet = ValveConfigs.Strike_Transfer;
+                        }
+                        
                         // Hold Strike Temp
                         breweryCommand.HoldTemp(Vessels.HLT, process.Strike.Temp);
 
-                        // If the user did not confirm, hold temperature and wait
-                        if (!userAlarm.ProceedIsPressed)
+                        // If the user did not set the correct valve configuration, hold temperature and wait
+                        if (!brewery.ValveConfig.Check(ValveConfigs.Strike_Transfer, brewery.Valves))
                         {
                             return;
                         }
@@ -426,19 +432,29 @@ namespace LAB.ViewModel
                 case BreweryState.DoughIn:
                     {
                         // Ask user to set the valves in recirculation mode and play alarm sound to request user action
-                        if (RecirculationConfirmed) { goto SkipRecirculationAlarm; }
+                        //if (RecirculationConfirmed) { goto SkipRecirculationAlarm; }
 
-                        if (!userAlarm.MessageSent)
+                        //if (!userAlarm.MessageSent)
+                        //{
+                        //    PlayAlarm("Recirculation", true, true, true);
+                        //}
+                        //else if(userAlarm.ProceedIsPressed)
+                        //{
+                        //    RecirculationConfirmed = true;
+                        //    userAlarm = new UserAlarm();
+                        //}
+
+                        // Set the Valve configuration request to Mash Recirculation
+                        if(!(brewery.ValveConfig.ConfigSet == ValveConfigs.Mash_Recirc))
                         {
-                            PlayAlarm("Recirculation", true, true, true);
-                        }
-                        else if(userAlarm.ProceedIsPressed)
-                        {
-                            RecirculationConfirmed = true;
-                            userAlarm = new UserAlarm();
+                            brewery.ValveConfig.Set(ValveConfigs.Mash_Recirc, brewery.Valves);
+                            brewery.ValveConfig.ConfigSet = ValveConfigs.Mash_Recirc;
                         }
 
-                    SkipRecirculationAlarm:
+                        // Check if the valves are in the requested position
+                        if(!(brewery.ValveConfig.Check(ValveConfigs.Mash_Recirc, brewery.Valves))) { return; }
+
+                    //SkipRecirculationAlarm:
 
                         // Hold MLT temp at set point (dough in temp)
                         breweryCommand.HoldTemp(Vessels.MLT, process.Strike.Temp);
@@ -1249,6 +1265,12 @@ namespace LAB.ViewModel
         private void BKTempSetPointReachedUpdate_MessageReceived(Brewery _brewery)
         {
             brewery.BK.Temp.SetPointReached = _brewery.BK.Temp.SetPointReached;
+        }
+
+        // Valve Update
+        private void ValveUpdate_MessageReceived(ObservableCollection<Brewery.valve> _ValveList)
+        {
+            brewery.Valves = _ValveList;
         }
 
         #endregion
