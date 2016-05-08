@@ -42,6 +42,7 @@ namespace LAB.ViewModel
             SimpleIoc.Default.Register<UserActionViewModel>();
             SimpleIoc.Default.Register<SidePanelViewModel>();
             SimpleIoc.Default.Register<TimerViewModel>();
+            SimpleIoc.Default.Register<ProcessPlotViewModel>();
         }
 
         /// <summary>
@@ -144,6 +145,14 @@ namespace LAB.ViewModel
             get
             {
                 return ServiceLocator.Current.GetInstance<TimerViewModel>();
+            }
+        }
+
+        public ProcessPlotViewModel ProcessPlot
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<ProcessPlotViewModel>();
             }
         }
 

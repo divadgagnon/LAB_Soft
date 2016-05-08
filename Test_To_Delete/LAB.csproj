@@ -45,6 +45,10 @@
     <Reference Include="GalaSoft.MvvmLight.Platform">
       <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net45\GalaSoft.MvvmLight.Platform.dll</HintPath>
     </Reference>
+    <Reference Include="LiveCharts, Version=0.6.7.0, Culture=neutral, PublicKeyToken=d1901e6ed2eb0532, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.0.6.7.0\lib\net451\LiveCharts.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
@@ -85,6 +89,7 @@
     <Compile Include="SerialComm\PacketEncoder\Interfaces\IPacketEncoder.cs" />
     <Compile Include="SerialComm\PacketEncoder\SimplePacketProtocolPacketEncoder.cs" />
     <Compile Include="SerialComm\SerialPortData\SerialPortSettings.cs" />
+    <Compile Include="ViewModel\ProcessPlotViewModel.cs" />
     <Compile Include="Views\BKinPipeView.xaml.cs">
       <DependentUpon>BKinPipeView.xaml</DependentUpon>
     </Compile>
@@ -101,6 +106,9 @@
     </Compile>
     <Compile Include="Views\MLTinPipeView.xaml.cs">
       <DependentUpon>MLTinPipeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProcessPlotView.xaml.cs">
+      <DependentUpon>ProcessPlotView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SidePanelView.xaml.cs">
       <DependentUpon>SidePanelView.xaml</DependentUpon>
@@ -193,6 +201,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\MLTinPipeView.xaml">
+      <SubType>Form</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ProcessPlotView.xaml">
       <SubType>Form</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -305,7 +317,7 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Media\Burner Flames.png" />
+    <Resource Include="Views\Images\Burner Flames.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Data\DefaultHardwareSettings.xml">

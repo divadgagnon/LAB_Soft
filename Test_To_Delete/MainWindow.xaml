@@ -211,26 +211,44 @@
                 </i:Interaction.Triggers>
                 <Views:BallValveView x:Name="BKout"/>
             </Viewbox>
-            <Views:UserActionView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,10"/>
             <GridSplitter Grid.Column="8" Width="5" Height="auto" HorizontalAlignment="Left" VerticalAlignment="Stretch" ResizeDirection="Columns" Grid.RowSpan="3"/>
-            <DockPanel x:Name="SidePanelContainer" Grid.Column="8" Grid.Row="0" Grid.RowSpan="3" DockPanel.Dock="Right">
-                <local:SidePanelView DockPanel.Dock="Top" 
+            <Grid Background="{DynamicResource MenuBackground}" x:Name="SidePanelContainer" Grid.Column="8" Grid.Row="0" Grid.RowSpan="3" DockPanel.Dock="Right" Margin="0,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="230"/>
+                </Grid.RowDefinitions>
+                <local:SidePanelView 
+                                 Grid.Row="0"
                                  Height="auto" 
                                  BorderThickness="0" 
                                  Margin="0" 
                                  Width="{Binding ElementName=SidePanelContainer, Path=ActualWidth}"
                                  VerticalContentAlignment="Top" 
-                                 VerticalAlignment="Stretch"
-                                 Background="{DynamicResource MenuBackground}"/>
+                                 VerticalAlignment="Top"
+                                 Background="{DynamicResource MenuBackground}"
+                                 Padding="0,0,0,10"/>
 
-                <Views:TimerView DockPanel.Dock="Bottom" 
-                             VerticalAlignment="Stretch" 
+                <Views:TimerView
+                             Grid.Row="1"
+                             VerticalAlignment="Bottom" 
                              VerticalContentAlignment="Bottom"
-                             Margin="0" 
                              Background="{DynamicResource MenuBackground}"/>
-            </DockPanel>
-            <DockPanel x:Name="ProcessPlotContainer" Grid.Row="2" Grid.ColumnSpan="7" Background="{DynamicResource MenuBackground}" Margin="0,35,-10,0">
-
+            </Grid>
+            <DockPanel x:Name="ProcessPlotContainer" Grid.Row="2" Grid.ColumnSpan="7" Background="{DynamicResource MenuBackground}" Margin="0,35,0,0" LastChildFill="True">
+                <StackPanel DockPanel.Dock="Left" Margin="15,0,0,0">
+                    <Label Content="Air Pumps Status" Foreground="{DynamicResource Principal_Forground}" FontSize="18" FontWeight="Bold"/>
+                    <Grid HorizontalAlignment="Stretch">
+                        <Label Content="HLT Air Pump" Foreground="{DynamicResource Principal_Forground}" FontSize="16" Margin="5,0,15,0" HorizontalAlignment="Left"/>
+                        <Ellipse Width="15" Height="15" Stroke="{DynamicResource Principal_Forground}" Fill="{Binding AirPump1Status}" StrokeThickness="1.2" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+                    </Grid>
+                    <Grid HorizontalAlignment="Stretch">
+                        <Label Content="BK Air Pump" Foreground="{DynamicResource Principal_Forground}" FontSize="16" Margin="5,0,15,0" HorizontalAlignment="Left"/>
+                        <Ellipse Width="15" Height="15" Stroke="{DynamicResource Principal_Forground}" Fill="{Binding AirPump2Status}" StrokeThickness="1.2" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+                    </Grid>
+                </StackPanel>
+                <Views:ProcessPlotView Margin="15,0,0,0"/>
+                <!-- <Views:UserActionView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="20,0,0,0" Panel.ZIndex="5000"/>
+                -->
             </DockPanel>
         </Grid>
 

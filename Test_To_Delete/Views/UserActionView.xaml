@@ -12,19 +12,72 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/LAB_V2;component/Skins/MainSkin.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="FocusVisual">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+            <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+            <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
+            <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+            <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+            <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+            <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+            <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+            <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+            <Style x:Key="UserActionButton" TargetType="{x:Type Button}">
+                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+                <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Padding" Value="1"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                                <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsDefaulted" Value="true">
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.MouseOver.Border}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="true">
+                                    <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                    <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
-        <Rectangle Fill="{DynamicResource Principal_Forground}" Stroke="White" Width="800" Height="180" RadiusX="5" RadiusY="5" StrokeThickness="3" Opacity="0.2"/>
-        <Rectangle Stroke="Red" StrokeThickness="4" Visibility="{Binding UserActionAlarm}" Width="800" Height="180" RadiusX="5" RadiusY="5" Opacity="0.5"/>
-        <StackPanel Orientation="Horizontal">
-            <Rectangle Width="10" VerticalAlignment="Stretch"/>
-            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Width="630" Text="{Binding DisplayText}" FontWeight="Bold" FontSize="22" Foreground="#FF400505" TextAlignment="Center" TextWrapping="Wrap" />
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button Content="Hold" Width="100" Margin="30" IsEnabled="{Binding HoldButtonIsEnabled}"/>
-                <Button Content="Proceed" Width="100" Margin="30" IsEnabled="{Binding ProccedButtonIsEnabled}" Command="{Binding ProceedClickCommand}"/>
+        <Rectangle x:Name="MainContainer" Fill="{DynamicResource MenuBackground}" Opacity="50" Stroke="Black" Width="auto" Height="auto" RadiusX="0" RadiusY="0" StrokeThickness="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <Rectangle Stroke="Red" StrokeThickness="4" Visibility="{Binding UserActionAlarm}" Width="{Binding ElementName=MainContainer, Path=ActualWidth}" Height="{Binding ElementName=MainContainer, Path=ActualHeight}" RadiusX="0" RadiusY="0" Opacity="0.5"/>
+        <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" LastChildFill="True">
+            <StackPanel x:Name="ButtonStackPanel" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0,3,3,3" DockPanel.Dock="Right">
+                <Button Content="Confirm&#xa; Action" Width="150" Margin="0" Height="{Binding ElementName=ButtonStackPanel, Path=ActualHeight}" IsEnabled="{Binding ProccedButtonIsEnabled}" Command="{Binding ProceedClickCommand}" Background="#FF1D1D1D" Foreground="#FF919191" FontSize="18" FontWeight="Bold" BorderBrush="{x:Null}"/>
             </StackPanel>
-        </StackPanel>
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="auto" Text="{Binding DisplayText}" FontWeight="Bold" FontSize="22" Foreground="#FF400505" TextAlignment="Center" TextWrapping="Wrap" />
+        </DockPanel>
     </Grid>
 </UserControl>

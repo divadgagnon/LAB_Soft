@@ -408,6 +408,51 @@ namespace LAB.Model
                             else { return false; }
                         }
 
+                    case ValveConfigs.Fly_Sparge:
+                        {
+                            if(Valves[0].IsOpen)
+                            {
+                                Valves[0].Request.Open = false;
+                                Messenger.Default.Send(Valves[0]);
+                            }
+
+                            if (Valves[1].IsOpen)
+                            {
+                                Valves[1].Request.Open = false;
+                                Messenger.Default.Send(Valves[1]);
+                            }
+
+                            if (Valves[2].IsOpen)
+                            {
+                                Valves[2].Request.Open = false;
+                                Messenger.Default.Send(Valves[2]);
+                            }
+
+                            if (!Valves[3].IsOpen)
+                            {
+                                Valves[3].Request.Close = false;
+                                Messenger.Default.Send(Valves[3]);
+                            }
+
+                            if (Valves[4].IsOpen)
+                            {
+                                Valves[4].Request.Open = false;
+                                Messenger.Default.Send(Valves[4]);
+                            }
+
+                            if (Valves[0].IsOpen && Valves[1].IsOpen && Valves[2].IsOpen && !Valves[3].IsOpen && Valves[4].IsOpen) { return true; }
+                            else { return false; }
+                        }
+
+                    case ValveConfigs.Fermenter_Transfer:
+                        {
+                            if(Valves[5].IsOpen) { Valves[5].Request.Open = false; }
+                            Messenger.Default.Send(Valves[5]);
+                        }
+
+                        if(Valves[5].IsOpen) { return true; }
+                        else { return false; }
+
                     default:
                         {
                             return false;
@@ -443,6 +488,35 @@ namespace LAB.Model
                             // Update the UI
                             Messenger.Default.Send(Valves[2]);
                             Messenger.Default.Send(Valves[3]);
+
+                            break;
+                        }
+
+                    case ValveConfigs.Fly_Sparge:
+                        {
+                            // Set the requests
+                            if(!Valves[0].IsOpen) { Valves[0].Request.Open = true; }
+                            if(!Valves[1].IsOpen) { Valves[1].Request.Open = true; }
+                            if(!Valves[2].IsOpen) { Valves[2].Request.Open = true; }
+                            if(Valves[3].IsOpen) { Valves[3].Request.Close = true; }
+                            if(!Valves[4].IsOpen) { Valves[4].Request.Open = true; }
+
+                            // Update the UI
+                            for(int i=0;i<=4;i++)
+                            {
+                                Messenger.Default.Send(Valves[i]);
+                            }
+
+                            break;
+                        }
+
+                    case ValveConfigs.Fermenter_Transfer:
+                        {
+                            // Set the requests
+                            if(!Valves[5].IsOpen) { Valves[5].Request.Open = true; }
+
+                            // Update the UI
+                            Messenger.Default.Send(Valves[5]);
 
                             break;
                         }
@@ -496,7 +570,7 @@ namespace LAB.Model
         Strike_Transfer,
         Mash_Recirc,
         Fly_Sparge,
-        Boil,
+        Fermenter_Transfer,
     }
 
     public enum BreweryState
