@@ -34,6 +34,8 @@ namespace LAB.ViewModel
             }
         }
 
+        public TimeSpan SessionTimeSpan { get { return sessionTime; } }
+
         public string StepTime
         {
             get

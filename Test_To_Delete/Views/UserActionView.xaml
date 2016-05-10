@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ignore="http://www.galasoft.ch/ignore"
         mc:Ignorable="d ignore"
-        DataContext="{Binding UserAction, Source={StaticResource Locator}}">
+        DataContext="{Binding UserAction, Source={StaticResource Locator}}"
+        >
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -70,14 +71,14 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Visibility="{Binding IsVisible}">
         <Rectangle x:Name="MainContainer" Fill="{DynamicResource MenuBackground}" Opacity="50" Stroke="Black" Width="auto" Height="auto" RadiusX="0" RadiusY="0" StrokeThickness="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         <Rectangle Stroke="Red" StrokeThickness="4" Visibility="{Binding UserActionAlarm}" Width="{Binding ElementName=MainContainer, Path=ActualWidth}" Height="{Binding ElementName=MainContainer, Path=ActualHeight}" RadiusX="0" RadiusY="0" Opacity="0.5"/>
         <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" LastChildFill="True">
             <StackPanel x:Name="ButtonStackPanel" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0,3,3,3" DockPanel.Dock="Right">
                 <Button Content="Confirm&#xa; Action" Width="150" Margin="0" Height="{Binding ElementName=ButtonStackPanel, Path=ActualHeight}" IsEnabled="{Binding ProccedButtonIsEnabled}" Command="{Binding ProceedClickCommand}" Background="#FF1D1D1D" Foreground="#FF919191" FontSize="18" FontWeight="Bold" BorderBrush="{x:Null}"/>
             </StackPanel>
-            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="auto" Text="{Binding DisplayText}" FontWeight="Bold" FontSize="22" Foreground="#FF400505" TextAlignment="Center" TextWrapping="Wrap" />
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="auto" Text="{Binding DisplayText}" FontWeight="Bold" FontSize="22" Foreground="{DynamicResource Principal_Forground}" TextAlignment="Center" TextWrapping="Wrap" />
         </DockPanel>
     </Grid>
 </UserControl>

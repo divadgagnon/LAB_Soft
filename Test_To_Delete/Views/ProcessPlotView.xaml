@@ -8,13 +8,31 @@
         mc:Ignorable="d ignore"
         DataContext="{Binding ProcessPlot, Source={StaticResource Locator}}">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LAB_V2;component/Skins/MainSkin.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
     <Grid>
-        <lvc:LineChart Series="{Binding DataSeries}" LegendLocation="Left" Width="auto" Height="auto" Background="White" Foreground="#FF9E0000" BorderBrush="#FF1109BD" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <lvc:LineChart Series="{Binding DataSeries}" 
+                       LegendLocation="Left" 
+                       Width="auto" 
+                       Height="auto" 
+                       Background="{DynamicResource MenuBackground}" 
+                       Foreground="#FF9E0000" BorderBrush="#FF1109BD" 
+                       HorizontalAlignment="Stretch" 
+                       VerticalAlignment="Stretch" 
+                       FontSize="16"
+                       DisableAnimations="True"
+                       Hoverable="False">
             <lvc:LineChart.AxisX>
                 <lvc:Axis Title="Time (s)"/>
             </lvc:LineChart.AxisX>
             <lvc:LineChart.AxisY>
-                <lvc:Axis Title="Temperature (°C)"/>
+                <lvc:Axis Title="Temperature (°C)" MaxValue="100" MinValue="0"/>
             </lvc:LineChart.AxisY>
         </lvc:LineChart>
     </Grid>

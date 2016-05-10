@@ -18,6 +18,7 @@ namespace LAB.ViewModel
         private bool holdButtonIsEnabled;
         private bool proceedButtonIsEnabled;
         private bool userActionIsRequired;
+        private bool isVisible = false;
 
         // Initializing Commands
         public RelayCommand ProceedClickCommand { get; private set; }
@@ -30,6 +31,7 @@ namespace LAB.ViewModel
         public const string HoldButtonIsEnabledPropertyName = "HoldButtonIsEnabled";
         public const string ProceedButtonIsEnabledPropertyName = "ProceedButtonIsEnabled";
         public const string UserActionAlarmPropertyName = "UserActionAlarm";
+        public const string IsVisiblePropertyName = "IsVisible";
 
         // Bindable Properties
         public string DisplayText
@@ -41,18 +43,6 @@ namespace LAB.ViewModel
                 if(displayText == value) { return; }
                 displayText = value;
                 RaisePropertyChanged(DisplayTextPropertyName);
-            }
-        }
-
-        public bool HoldButtonIsEnabled
-        {
-            get { return holdButtonIsEnabled; }
-
-            set
-            {
-                if (holdButtonIsEnabled == value) { return; }
-                holdButtonIsEnabled = value;
-                RaisePropertyChanged(HoldButtonIsEnabledPropertyName);
             }
         }
 
@@ -73,6 +63,15 @@ namespace LAB.ViewModel
             get
             {
                 if(userActionIsRequired) { return "Visible"; }
+                else { return "Hidden"; }
+            }
+        }
+
+        public string IsVisible
+        {
+            get
+            {
+                if(isVisible) { return "Visible"; }
                 else { return "Hidden"; }
             }
         }
@@ -103,6 +102,8 @@ namespace LAB.ViewModel
             displayText = "";
             proceedButtonIsEnabled = false;
             userActionIsRequired = false;
+            isVisible = false;
+            RaisePropertyChanged(IsVisiblePropertyName);
             RaisePropertyChanged(DisplayTextPropertyName);
             RaisePropertyChanged(UserActionAlarmPropertyName);
             UserActionAlarmTimer.Stop();
@@ -115,6 +116,9 @@ namespace LAB.ViewModel
         {
             if (userAlarm.IsActive)
             {
+                isVisible = true;
+                RaisePropertyChanged(IsVisiblePropertyName);
+
                 if (userAlarm.VisualAlarm)
                 {
                     UserActionAlarmTimer.Interval = System.TimeSpan.FromMilliseconds(1000);
