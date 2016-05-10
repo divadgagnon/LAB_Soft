@@ -82,6 +82,7 @@ namespace LAB.ViewModel
         public const string AutomationModeCheckedPropertyName = "AutomationModeChecked";
         public const string AirPump1StatusPropertyName = "AirPump1Status";
         public const string AirPump2StatusPropertyName = "AirPump2Status";
+        public const string MashTimerDisplayPropertyName = "MashTimerDisplay";
 
         // Define Bindable Properties
         public string ConnectionStatus
@@ -210,6 +211,20 @@ namespace LAB.ViewModel
             {
                 if (brewery.AirPump1.IsOn) { return OnColor; }
                 else { return OffColor; }
+            }
+        }
+
+        // Mash steps timer display text property
+        public string MashTimerDisplay
+        {
+            get
+            {
+                if(breweryState == BreweryState.Mash)
+                {
+                    return "MashStep " + step+1 + " of " + process.MashSteps.Count + "\n" +
+                        process.MashSteps[step].Name + " : " + RemainingTime.Minutes + " : " + String.Format("{0:00}", RemainingTime.Seconds);
+                }
+                else { return "N/A"; }
             }
         }
 
@@ -952,6 +967,7 @@ namespace LAB.ViewModel
         {
             // Increment ElapsedTime
             RemainingTime = StepEndTime - DateTime.Now.TimeOfDay;
+            RaisePropertyChanged(MashTimerDisplayPropertyName);
 
             // Check if mash step is completed
             if (DateTime.Now.TimeOfDay >= StepEndTime)
@@ -961,17 +977,6 @@ namespace LAB.ViewModel
                 if(process.MashSteps.Count == step+1) { return; }
                 step++;
             }
-
-            // Send Mash step info
-            userAlarm = new UserAlarm();
-            userAlarm.ProcessData = process;
-            userAlarm.VisualAlarm = false;
-            userAlarm.CurrentState = breweryState;
-            userAlarm.CurrentMashStep = step;
-            userAlarm.RemainingTime = RemainingTime;
-            userAlarm.IsActive = true;
-
-            Messenger.Default.Send<UserAlarm>(userAlarm);
         }
 
         private void BoilTimer_Tick(object sender, EventArgs e)

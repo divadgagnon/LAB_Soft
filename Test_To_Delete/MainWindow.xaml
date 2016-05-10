@@ -245,6 +245,8 @@
                         <Label Content="BK Air Pump" Foreground="{DynamicResource Principal_Forground}" FontSize="16" Margin="5,0,15,0" HorizontalAlignment="Left"/>
                         <Ellipse Width="15" Height="15" Stroke="{DynamicResource Principal_Forground}" Fill="{Binding AirPump2Status}" StrokeThickness="1.2" HorizontalAlignment="Right" Margin="0,0,5,0"/>
                     </Grid>
+                    <Label Content="Mash Timer" Foreground="{DynamicResource Principal_Forground}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <Label Content="{Binding MashTimerDisplay}" Foreground="{DynamicResource Principal_Forground}" FontSize="16" HorizontalAlignment="Center"/>
                 </StackPanel>
                 <Grid DockPanel.Dock="Left">
                     <Views:ProcessPlotView Margin="15,0,0,0"/>

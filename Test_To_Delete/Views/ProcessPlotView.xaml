@@ -29,7 +29,7 @@
                        DisableAnimations="True"
                        Hoverable="False">
             <lvc:LineChart.AxisX>
-                <lvc:Axis Title="Time (s)"/>
+                <lvc:Axis Title="Time (s)" MaxValue="3600" MinValue="0"/>
             </lvc:LineChart.AxisX>
             <lvc:LineChart.AxisY>
                 <lvc:Axis Title="Temperature (°C)" MaxValue="100" MinValue="0"/>

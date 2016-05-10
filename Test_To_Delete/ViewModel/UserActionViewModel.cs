@@ -161,7 +161,6 @@ namespace LAB.ViewModel
                             + " l of water to the hot liquor tank.";
                         RaisePropertyChanged(DisplayTextPropertyName);
                         proceedButtonIsEnabled = false;
-                        holdButtonIsEnabled = false;
                         break;
                     }
 
@@ -173,23 +172,13 @@ namespace LAB.ViewModel
                                 + "proceed button once all pilot lights are verified";
                             RaisePropertyChanged(DisplayTextPropertyName);
                             proceedButtonIsEnabled = true;
-                            holdButtonIsEnabled = false;
                         }
                         break;
                     }
 
                 case BreweryState.Strike_Transfer:
                     {
-                        if (userAlarm.AlarmType == "Valves")
-                        {
-                            displayText = "Turn on valves (to implement) and proceed to start the transfer";
-                            RaisePropertyChanged(DisplayTextPropertyName);
-                            proceedButtonIsEnabled = true;
-                            holdButtonIsEnabled = true;
-                            RaisePropertyChanged(ProceedButtonIsEnabledPropertyName);
-                            RaisePropertyChanged(HoldButtonIsEnabledPropertyName);
-                        }
-                        else if(userAlarm.AlarmType == "Priming")
+                        if(userAlarm.AlarmType == "Priming")
                         {
                             displayText = "Waiting for pump priming delay to end...";
                             RaisePropertyChanged(DisplayTextPropertyName);
@@ -205,12 +194,7 @@ namespace LAB.ViewModel
 
                 case BreweryState.DoughIn:
                     {
-                        if (userAlarm.AlarmType == "Recirculation")
-                        {
-                            displayText = "Set the valves in recirculation mode";
-                            RaisePropertyChanged(DisplayTextPropertyName);
-                        }
-                        else if (userAlarm.AlarmType == "DoughIn")
+                        if (userAlarm.AlarmType == "DoughIn")
                         {
                             displayText = "Add : \n";
                             foreach (var malt in ingredients.Malts)
@@ -224,27 +208,12 @@ namespace LAB.ViewModel
 
                 case BreweryState.Mash:
                     {
-                        int minStep = userAlarm.RemainingTime.Minutes;
-                        int secStep = userAlarm.RemainingTime.Seconds;
-                        int mashStep = userAlarm.CurrentMashStep + 1;
-
-                        displayText = "Mash Step " + mashStep + " of " + userAlarm.ProcessData.MashSteps.Count + " : " 
-                            + userAlarm.ProcessData.MashSteps[userAlarm.CurrentMashStep].Name + "\n" + (minStep) + " : " 
-                            + String.Format( "{0:00}", secStep);
-                        RaisePropertyChanged(DisplayTextPropertyName);
-
                         break;
                     }
 
                 case BreweryState.Sparge:
                     {
-                        if (userAlarm.AlarmType == "ValveSpargeMode")
-                        {
-                            displayText = "Set the valves to sparge mode";
-                            RaisePropertyChanged(DisplayTextPropertyName);
-                        }
-
-                        else if(userAlarm.AlarmType == "MissingSpargeWater")
+                        if(userAlarm.AlarmType == "MissingSpargeWater")
                         {
                             displayText = "Target sparge wolume could not be reached" + "\n" + "total HLT volume was missing "
                                 + Math.Round(userAlarm.NumData,2) + " l";

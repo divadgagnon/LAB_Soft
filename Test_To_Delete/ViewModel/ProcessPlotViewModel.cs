@@ -7,15 +7,22 @@ using LiveCharts;
 using GalaSoft.MvvmLight.Messaging;
 using LAB.Model;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace LAB.ViewModel
 {
     public class ProcessPlotViewModel
     {
         SeriesCollection dataSeries;
-        SeriesConfiguration<ChartConfig> Config = new SeriesConfiguration<ChartConfig>();
         LineSeries HLTTemp = new LineSeries();
         LineSeries HLTTempSetPoint = new LineSeries();
+
+        private double currentTemp;
+        private double currentSetPoint;
+        private TimeSpan startTime;
+        private TimeSpan currentTime;
+        private BreweryState currentState = BreweryState.StandBy;
+        private DispatcherTimer UpdateTimer = new DispatcherTimer();
 
         public SeriesCollection DataSeries
         {
@@ -24,13 +31,10 @@ namespace LAB.ViewModel
 
         public ProcessPlotViewModel()
         {
-            Config.X(model => model.CurrentTemp);
-            Config.Y(model => model.CurrentTemp);
+            dataSeries = new SeriesCollection();
 
-            dataSeries = new SeriesCollection(Config);
-
-            HLTTemp.Values = new ChartValues<double> { };
-            HLTTempSetPoint.Values = new ChartValues<double> { };
+            HLTTemp.Values = new ChartValues<double>();
+            HLTTempSetPoint.Values = new ChartValues<double>();
 
             HLTTemp.PointRadius = 0;
             HLTTempSetPoint.PointRadius = 0;
@@ -42,22 +46,11 @@ namespace LAB.ViewModel
             
             dataSeries.Add(HLTTemp);
             dataSeries.Add(HLTTempSetPoint);
-        }
-    }
-
-    public class ChartConfig
-    {
-        private TimeSpan startTime;
-        private TimeSpan currentTime;
-        private BreweryState currentState = BreweryState.StandBy;
-
-        public double CurrentTemp { get; }
-        public TimeSpan CurrentTime { get; }
-
-        public ChartConfig()
-        {
             startTime = new TimeSpan();
             currentTime = new TimeSpan();
+
+            HLTTemp.Values.Add(currentTemp);
+            HLTTempSetPoint.Values.Add(currentSetPoint);
 
             Messenger.Default.Register<BreweryState>(this, breweryState_MessageReceived);
         }
@@ -65,21 +58,38 @@ namespace LAB.ViewModel
         // Incoming Messages handling
         private void breweryState_MessageReceived(BreweryState breweryState)
         {
-            if(breweryState != currentState && breweryState == BreweryState.Strike_Heat)
+            if (breweryState != currentState && breweryState == BreweryState.Strike_Heat)
             {
                 startTime = DateTime.Now.TimeOfDay;
                 Messenger.Default.Register<Brewery>(this, "TemperatureUpdate", TemperatureUpdate_MessageReceived);
                 Messenger.Default.Register<Brewery>(this, "HLTTempSetPointUpdate", HLTTempSetPointUpdate_MessageReceived);
+
+                UpdateTimer.Interval = TimeSpan.FromSeconds(1);
+                UpdateTimer.Tick += UpdateTimer_Tick;
+                UpdateTimer.Start();
             }
+
+            if(breweryState == BreweryState.Boil) { UpdateTimer.Stop(); }
+        }
+
+        private void UpdateTimer_Tick(object sender, EventArgs e)
+        {
+            if(HLTTemp.Values.Count > 3600) { HLTTemp.Values.RemoveAt(0); }
+            if(HLTTempSetPoint.Values.Count > 3600) { HLTTempSetPoint.Values.RemoveAt(0); }
+
+            HLTTemp.Values.Add(currentTemp);
+            HLTTempSetPoint.Values.Add(currentSetPoint);
         }
 
         private void TemperatureUpdate_MessageReceived(Brewery _brewery)
         {
+            currentTemp = _brewery.HLT.Temp.Value;
             currentTime = DateTime.Now.TimeOfDay - startTime;
         }
 
         private void HLTTempSetPointUpdate_MessageReceived(Brewery _brewery)
         {
+            currentSetPoint = _brewery.HLT.Temp.SetPoint;
             currentTime = DateTime.Now.TimeOfDay - startTime;
         }
     }
