@@ -215,16 +215,44 @@ namespace LAB.ViewModel
         }
 
         // Mash steps timer display text property
-        public string MashTimerDisplay
+        ObservableCollection<MashTimerDisplayItem> MashStepDisplayList = new ObservableCollection<MashTimerDisplayItem>();
+
+        public ObservableCollection<MashTimerDisplayItem> MashTimerDisplay
         {
             get
             {
+                MashStepDisplayList.Clear();
+
                 if(breweryState == BreweryState.Mash)
                 {
-                    return "MashStep " + step+1 + " of " + process.MashSteps.Count + "\n" +
-                        process.MashSteps[step].Name + " : " + RemainingTime.Minutes + " : " + String.Format("{0:00}", RemainingTime.Seconds);
+                    
+                    foreach( Process.MashStep Step in process.MashSteps)
+                    {
+                        TimeSpan StepTimeSpan = TimeSpan.FromMinutes(Step.Time);
+
+                        if (process.MashSteps.IndexOf(Step) < step) { }
+
+                        else if (process.MashSteps[step] == Step)
+                        {
+                            MashStepDisplayList.Add(new MashTimerDisplayItem() { StepName = Step.Name, Time = RemainingTime.Minutes + " : " + String.Format("{0:00}", RemainingTime.Seconds) });
+                        }
+                        else
+                        {
+                            MashStepDisplayList.Add(new MashTimerDisplayItem() { StepName = Step.Name, Time = StepTimeSpan.Minutes + ":" + String.Format("{0:00}", StepTimeSpan.Seconds) });
+                        }
+                    }
                 }
-                else { return "N/A"; }
+                else
+                {
+                    foreach (Process.MashStep Step in process.MashSteps)
+                    {
+                        TimeSpan StepTimeSpan = TimeSpan.FromMinutes(Step.Time);
+
+                        MashStepDisplayList.Add(new MashTimerDisplayItem() { StepName = Step.Name, Time = StepTimeSpan.Minutes + ":" + String.Format("{0:00}", StepTimeSpan.Seconds) });
+                    }
+                }
+
+                return MashStepDisplayList;
             }
         }
 
@@ -537,7 +565,7 @@ namespace LAB.ViewModel
                             StepEndTime = StepStartTime.Add(TimeSpan.FromMinutes(process.MashSteps[step].Time));
 
                             // Start the step timer
-                            MashStepTimer.Interval = TimeSpan.FromMilliseconds(500);
+                            MashStepTimer.Interval = TimeSpan.FromMilliseconds(250);
                             MashStepTimer.Tick += MashStepTimer_Tick;
                             MashStepTimer.Start();
                         }
@@ -1161,6 +1189,7 @@ namespace LAB.ViewModel
         private void Process_MessageReceived(Process _process)
         {
             process = _process;
+            RaisePropertyChanged(MashTimerDisplayPropertyName);
 
             // Start Session if session start was already requested
             if(process.Session.StartRequested) { startBrewSessionClickCommand(); }

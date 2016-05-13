@@ -17,6 +17,9 @@ namespace LAB.ViewModel
         LineSeries HLTTemp = new LineSeries();
         LineSeries HLTTempSetPoint = new LineSeries();
 
+        public Func<double,string> XFormatter { get; set; }
+        public Func<double, double> YFormatter { get; set; }
+
         private double currentTemp;
         private double currentSetPoint;
         private TimeSpan startTime;
@@ -52,6 +55,8 @@ namespace LAB.ViewModel
             HLTTemp.Values.Add(currentTemp);
             HLTTempSetPoint.Values.Add(currentSetPoint);
 
+            XFormatter = val => (val / 10).ToString();
+
             Messenger.Default.Register<BreweryState>(this, breweryState_MessageReceived);
         }
 
@@ -64,7 +69,7 @@ namespace LAB.ViewModel
                 Messenger.Default.Register<Brewery>(this, "TemperatureUpdate", TemperatureUpdate_MessageReceived);
                 Messenger.Default.Register<Brewery>(this, "HLTTempSetPointUpdate", HLTTempSetPointUpdate_MessageReceived);
 
-                UpdateTimer.Interval = TimeSpan.FromSeconds(1);
+                UpdateTimer.Interval = TimeSpan.FromSeconds(6);
                 UpdateTimer.Tick += UpdateTimer_Tick;
                 UpdateTimer.Start();
             }
@@ -74,8 +79,8 @@ namespace LAB.ViewModel
 
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
-            if(HLTTemp.Values.Count > 3600) { HLTTemp.Values.RemoveAt(0); }
-            if(HLTTempSetPoint.Values.Count > 3600) { HLTTempSetPoint.Values.RemoveAt(0); }
+            if(HLTTemp.Values.Count > 600) { HLTTemp.Values.RemoveAt(0); }
+            if(HLTTempSetPoint.Values.Count > 600) { HLTTempSetPoint.Values.RemoveAt(0); }
 
             HLTTemp.Values.Add(currentTemp);
             HLTTempSetPoint.Values.Add(currentSetPoint);

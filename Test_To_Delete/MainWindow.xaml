@@ -246,7 +246,16 @@
                         <Ellipse Width="15" Height="15" Stroke="{DynamicResource Principal_Forground}" Fill="{Binding AirPump2Status}" StrokeThickness="1.2" HorizontalAlignment="Right" Margin="0,0,5,0"/>
                     </Grid>
                     <Label Content="Mash Timer" Foreground="{DynamicResource Principal_Forground}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
-                    <Label Content="{Binding MashTimerDisplay}" Foreground="{DynamicResource Principal_Forground}" FontSize="16" HorizontalAlignment="Center"/>
+                    <ListBox x:Name="MashTimerListBox" ItemsSource="{Binding MashTimerDisplay}" Foreground="{DynamicResource Principal_Forground}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel HorizontalAlignment="Center" VerticalAlignment="Stretch" LastChildFill="True" Width="140">
+                                    <Label Content="{Binding StepName}" FontSize="16" Foreground="{DynamicResource Principal_Forground}" DockPanel.Dock="Left"/>
+                                    <Label Content="{Binding Time}" FontSize="16" Foreground="{DynamicResource Principal_Forground}" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
                 </StackPanel>
                 <Grid DockPanel.Dock="Left">
                     <Views:ProcessPlotView Margin="15,0,0,0"/>

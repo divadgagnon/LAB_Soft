@@ -15,7 +15,6 @@ namespace LAB.ViewModel
 
         // Initializing Private Variables
         private string displayText;
-        private bool holdButtonIsEnabled;
         private bool proceedButtonIsEnabled;
         private bool userActionIsRequired;
         private bool isVisible = false;
@@ -91,6 +90,7 @@ namespace LAB.ViewModel
             // Registering to relevant messages
             Messenger.Default.Register<UserAlarm>(this, SetUserActionAlarm);
             Messenger.Default.Register<Ingredients>(this, Ingredients_MessageReceived);
+            Messenger.Default.Register<BreweryState>(this, BreweryState_MessageReceived);
         }
 
         // Proceed button click command
@@ -132,6 +132,11 @@ namespace LAB.ViewModel
         private void Ingredients_MessageReceived(Ingredients _ingredients)
         {
             ingredients = _ingredients;
+        }
+
+        private void BreweryState_MessageReceived(BreweryState _breweryState)
+        {
+            if(_breweryState == BreweryState.DoughIn) { isVisible = false;  RaisePropertyChanged(IsVisiblePropertyName); }
         }
 
         // Timer Tick Events

@@ -542,6 +542,12 @@ namespace LAB.Model
         public double NumData { get; set; }
     }
 
+    public class MashTimerDisplayItem
+    {
+        public string StepName { get; set; }
+        public string Time { get; set; }
+    }
+
     public class DataLog
     {
         // à implémenter
