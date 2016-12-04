@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Threading;
 using GalaSoft.MvvmLight.Messaging;
-using System.IO.Ports;
 using SerialComm;
 using SerialComm.PacketEncoder;
-using LAB.Model;
 
 namespace LAB.Model
 {

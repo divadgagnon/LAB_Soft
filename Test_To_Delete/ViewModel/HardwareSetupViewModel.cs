@@ -515,9 +515,10 @@ namespace LAB.ViewModel
 
             //Register to incoming messages
             Messenger.Default.Register<Probes>(this, "GetConnectedProbes", Probes_MessageReceived);
+            Messenger.Default.Register<NotificationMessage>(this, "SetDefaultHardwareSettings", SetDefaultHardwareSettings_MessageReceived);
 
             // Set Default Values for settings
-            GetSaveedSettings();
+            GetSavedSettings();
             SetDefaultSettings();
         }
 
@@ -534,9 +535,9 @@ namespace LAB.ViewModel
             Pump2_Pin = hardwareSettings.Pump2_Pin;
             AirPump1_Pin = hardwareSettings.AirPump1_Pin;
             AirPump2_Pin = hardwareSettings.AirPump2_Pin;
-            HLT_Temp_Probe = "Yellow";
-            MLT_Temp_Probe = "Pink";
-            BK_Temp_Probe = "Orange";
+            HLT_Temp_Probe = hardwareSettings.HLT_Temp_Probe.Color;
+            MLT_Temp_Probe = hardwareSettings.MLT_Temp_Probe.Color;
+            BK_Temp_Probe = hardwareSettings.BK_Temp_Probe.Color;
         }
 
         private void cancelClickCommand()
@@ -745,7 +746,7 @@ namespace LAB.ViewModel
         }
 
         // Get the settings saved as default
-        private void GetSaveedSettings()
+        private void GetSavedSettings()
         {
             XmlSerializer serializer = new XmlSerializer(hardwareSettings.GetType());
             StreamReader reader = new StreamReader(DefaultSettingsPath);
@@ -996,6 +997,7 @@ namespace LAB.ViewModel
             Messenger.Default.Send<NotificationMessage>(new NotificationMessage("CloseProbeColorsDiaglog"), "WindowOperation");
         }
 
+        // Update received from temp probes
         private void Probes_MessageReceived(Probes probes)
         {
             ProbeColors.Clear(); 
@@ -1005,6 +1007,17 @@ namespace LAB.ViewModel
             if(probes.Yellow.IsConnected) { ProbeColors.Add(probes.Yellow.Color); }
             if(probes.YellowOrange.IsConnected) { ProbeColors.Add(probes.YellowOrange.Color); }
             if (probes.YellowPink.IsConnected) { ProbeColors.Add(probes.YellowPink.Color); }  
+        }
+
+        // Set default settings on startup
+        private void SetDefaultHardwareSettings_MessageReceived(NotificationMessage msg)
+        {
+            // Get and set saved settings
+            GetSavedSettings();
+            SetDefaultSettings();
+
+            // Send the new hardwaresettings to the arduinoCommands Class
+            Messenger.Default.Send<HardwareSettings>(hardwareSettings, "HardwareSettingsUpdate");
         }
     }
 }

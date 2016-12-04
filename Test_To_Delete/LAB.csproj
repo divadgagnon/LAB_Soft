@@ -295,7 +295,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Firmware\Calibration_Firmwarer.ino" />
     <None Include="Firmware\LAB_V2_Firmware.ino" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

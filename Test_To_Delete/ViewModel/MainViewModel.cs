@@ -28,7 +28,6 @@ namespace LAB.ViewModel
         public RelayCommand SemiAutoModeClickCommand { get; private set; }
         public RelayCommand ManualModeClickCommand { get; private set; }
         public RelayCommand<Brewery.valve> ValveClickCommand { get; private set; }
-        public RelayCommand SensorCalibrationClickCommand { get; private set; }
         public RelayCommand AirPump1ClickCommand { get; private set; }
         public RelayCommand AirPump2ClickCommand { get; private set; }
 
@@ -340,7 +339,6 @@ namespace LAB.ViewModel
             SemiAutoModeClickCommand = new RelayCommand(semiAutomaticModeClickCommand);
             ManualModeClickCommand = new RelayCommand(manualModeClickCommand);
             ValveClickCommand = new RelayCommand<Brewery.valve>(valveClickCommand);
-            SensorCalibrationClickCommand = new RelayCommand(sensorCalibrationClickCommand);
             AirPump1ClickCommand = new RelayCommand(airPump1ClickCommand);
             AirPump2ClickCommand = new RelayCommand(airPump2ClickCommand);
 
@@ -398,6 +396,9 @@ namespace LAB.ViewModel
             Messenger.Default.Register<Brewery.pump>(this, "PumpOverride", PumpOverride_MessageReceived);
             Messenger.Default.Register<ObservableCollection<Brewery.valve>>(this, ValveUpdate_MessageReceived);
             Messenger.Default.Register<Ingredients>(this, (Ingredients _ingredients) => { ingredients = _ingredients; });
+
+            // Get and set the saved hardware settings on startup
+            Messenger.Default.Send<NotificationMessage>(new NotificationMessage(this,""), "SetDefaultHardwareSettings");
         }
 
         #endregion
@@ -1012,31 +1013,6 @@ namespace LAB.ViewModel
 
         #endregion
 
-        #region Calibration StateMachine
-
-        private void RunCalibrationStateMachine()
-        {
-            switch(brewery.Calibration.State)
-            {
-                case CalibrationState.StandBy:
-                    {
-                        return;
-                    }
-                case CalibrationState.Setup:
-                    {
-                        // Turn on air pump 1 for Level monitoring
-                        if (!brewery.AirPump1.IsOn)
-                        {
-                            breweryCommand.ActivateAirPump1(RelayState.On);
-                        }
-
-                        return;
-                    }
-            }
-        }
-
-        #endregion
-
         #region StateMachine Secondary Methods
 
         private void PlayAlarm(string AlarmType, bool Audible, bool Visual, bool ProceedComfirmationRequired, double NumData = 0)
@@ -1320,15 +1296,6 @@ namespace LAB.ViewModel
             if(_Valve == null) { throw new Exception("Valve Paramater was null"); }
             brewery.Valves[_Valve.Number].IsOpen = !_Valve.IsOpen;
             Messenger.Default.Send(brewery.Valves[_Valve.Number]);
-        }
-
-        private void sensorCalibrationClickCommand()
-        {
-            // Make sure a session is not currently running
-            if(process.Session.IsStarted) { return; }
-            brewery.CalibrationModeOn = true;
-            Messenger.Default.Send<Brewery>(brewery, "CalibrationMode");
-            RunCalibrationStateMachine();
         }
 
         // Gets executed before the application shuts down to close the comPort

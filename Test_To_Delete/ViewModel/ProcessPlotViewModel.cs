@@ -1,25 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Input;
 using LiveCharts;
 using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight;
 using LAB.Model;
 using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace LAB.ViewModel
 {
-    public class ProcessPlotViewModel
+    public class ProcessPlotViewModel : ViewModelBase
     {
+        // Define Chart classes
         SeriesCollection dataSeries;
         LineSeries HLTTemp = new LineSeries();
         LineSeries HLTTempSetPoint = new LineSeries();
 
-        public Func<double,string> XFormatter { get; set; }
-        public Func<double, double> YFormatter { get; set; }
+        // Define Bindable Properties
+        public Func<double, string> XFormatter { get; private set; }
+        public Func<double, double> YFormatter { get; private set; }
 
+        public const string MinValuePropertyName = "MinValue";
+        public const string MaxValuePropertyName = "MaxValue";
+
+        public int MinValue { get; private set; }
+        public int MaxValue { get; private set; }
+        private int XAxisScale { get; set; } = 600;
+
+        // Define private variables
         private double currentTemp;
         private double currentSetPoint;
         private TimeSpan startTime;
@@ -46,6 +55,9 @@ namespace LAB.ViewModel
 
             HLTTemp.Title = "HLT Temp.";
             HLTTempSetPoint.Title = "Set Point";
+
+            MinValue = 0;
+            MaxValue = XAxisScale;
             
             dataSeries.Add(HLTTemp);
             dataSeries.Add(HLTTempSetPoint);
@@ -79,8 +91,14 @@ namespace LAB.ViewModel
 
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
-            if(HLTTemp.Values.Count > 600) { HLTTemp.Values.RemoveAt(0); }
-            if(HLTTempSetPoint.Values.Count > 600) { HLTTempSetPoint.Values.RemoveAt(0); }
+            if(HLTTemp.Values.Count > XAxisScale)
+            {
+                MaxValue++;
+                MinValue++;
+
+                RaisePropertyChanged(MaxValuePropertyName);
+                RaisePropertyChanged(MinValuePropertyName);
+            }
 
             HLTTemp.Values.Add(currentTemp);
             HLTTempSetPoint.Values.Add(currentSetPoint);

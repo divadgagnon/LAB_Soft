@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ignore="http://www.galasoft.ch/ignore"
         xmlns:lvc="clr-namespace:LiveCharts;assembly=LiveCharts"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:cmd="http://www.galasoft.ch/mvvmlight"
         mc:Ignorable="d ignore"
         DataContext="{Binding ProcessPlot, Source={StaticResource Locator}}">
 
@@ -16,9 +18,9 @@
         </ResourceDictionary>
     </UserControl.Resources>
     
-    <Grid>
+    <Grid Background="Transparent">
+
         <lvc:LineChart Series="{Binding DataSeries}" 
-                       LegendLocation="Left" 
                        Width="auto" 
                        Height="auto" 
                        Background="{DynamicResource MenuBackground}" 
@@ -28,12 +30,18 @@
                        FontSize="16"
                        DisableAnimations="True"
                        Hoverable="False">
+            
             <lvc:LineChart.AxisX>
-                <lvc:Axis Title="Time (minutes)" MaxValue="600" MinValue="0" LabelFormatter="{Binding XFormatter}"/>
+                <lvc:Axis Title="Time (minutes)" MaxValue="{Binding MaxValue}" MinValue="{Binding MinValue}" LabelFormatter="{Binding XFormatter}"/>
             </lvc:LineChart.AxisX>
             <lvc:LineChart.AxisY>
                 <lvc:Axis Title="Temperature (°C)" MaxValue="100" MinValue="0"/>
             </lvc:LineChart.AxisY>
         </lvc:LineChart>
+        
+        <!-- Debugging displays-->
+        
+        <Label Content="{Binding MaxValue}" Foreground="Transparent"/>
+        
     </Grid>
 </UserControl>
