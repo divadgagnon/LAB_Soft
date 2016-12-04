@@ -147,6 +147,7 @@ namespace LAB.Model
     {
         public int Pin { get; set; }
         public int Value { get; set; }
+        public bool OverByte { get; set; }
     }
 
     public class DigitalReturn
@@ -249,6 +250,7 @@ namespace LAB.Model
     public class Brewery
     {
         public bool IsConnected { get; set; }
+        public bool CalibrationModeOn { get; set; }
 
         public vessel HLT { get; set; }
         public vessel MLT { get; set; }
@@ -260,6 +262,7 @@ namespace LAB.Model
         public automationMode AutomationMode { get; set; } = automationMode.Automatic;
         public ObservableCollection<valve> Valves { get; set; }
         public valveConfig ValveConfig { get; set; }
+        public calibration Calibration { get; set; }
 
         public Brewery()
         {
@@ -274,6 +277,7 @@ namespace LAB.Model
             AutomationMode = new automationMode();
             ValveConfig = new valveConfig();
             ValveConfig.ConfigSet = ValveConfigs.AllOff;
+            Calibration = new calibration();
 
             // Create Valve List
             Valves = new ObservableCollection<valve>();
@@ -331,6 +335,17 @@ namespace LAB.Model
             public bool IsOn { get; set; }
             public bool IsPrimed { get; set; }
             public bool IsPriming { get; set; }
+        }
+
+        public class calibration
+        {
+            public CalibrationState State { get; set; } = CalibrationState.StandBy;
+            public bool IsOn { get; set; }
+
+            public calibration()
+            {
+                State = new CalibrationState();
+            }
         }
 
         public class valve
@@ -593,6 +608,16 @@ namespace LAB.Model
         Chill,
         Fermenter_Transfer,
         Manual_Override,
+        CalibrationMode,
+    }
+
+    public enum CalibrationState
+    {
+        StandBy,
+        Setup,
+        Fill,
+        DataAquisition,
+        OutputData,
     }
 
     public enum PinModes

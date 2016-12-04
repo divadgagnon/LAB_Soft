@@ -249,6 +249,7 @@ namespace LAB
             AnalogReturn volSensor = new AnalogReturn();
             volSensor.Pin = packet[1];
             volSensor.Value = packet[2];
+            volSensor.OverByte = packet[3] == 1 ;
 
             // Send volSensor data to brewery command class
             Messenger.Default.Send<AnalogReturn>(volSensor, "VolumeUpdate");            

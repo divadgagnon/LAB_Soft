@@ -1,31 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <HardwareSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <comPort>COM3</comPort>
   <VolResfreshRate>2000</VolResfreshRate>
   <TempRefreshRate>2500</TempRefreshRate>
   <OneWireBus>2</OneWireBus>
-  <HLT_Vol_Pin>0</HLT_Vol_Pin>
-  <BK_Vol_Pin>1</BK_Vol_Pin>
-  <Pump1_Pin>6</Pump1_Pin>
-  <Pump2_Pin>7</Pump2_Pin>
-  <HLT_Burner_Pin>3</HLT_Burner_Pin>
-  <MLT_Burner_Pin>4</MLT_Burner_Pin>
+  <HLT_Vol_Pin>1</HLT_Vol_Pin>
+  <BK_Vol_Pin>0</BK_Vol_Pin>
+  <Pump1_Pin>9</Pump1_Pin>
+  <Pump2_Pin>8</Pump2_Pin>
+  <HLT_Burner_Pin>4</HLT_Burner_Pin>
+  <MLT_Burner_Pin>3</MLT_Burner_Pin>
   <BK_Burner_Pin>5</BK_Burner_Pin>
-  <AirPump1_Pin>8</AirPump1_Pin>
-  <AirPump2_Pin>9</AirPump2_Pin>
+  <AirPump1_Pin>6</AirPump1_Pin>
+  <AirPump2_Pin>7</AirPump2_Pin>
   <PrimingDelay>5000</PrimingDelay>
   <HLT_Temp_Probe>
-    <Address>0</Address>
+    <Address>79</Address>
     <Temp>0</Temp>
-    <IsConnected>false</IsConnected>
+    <IsConnected>true</IsConnected>
+    <Color>Pink</Color>
   </HLT_Temp_Probe>
   <MLT_Temp_Probe>
-    <Address>0</Address>
+    <Address>38</Address>
     <Temp>0</Temp>
-    <IsConnected>false</IsConnected>
+    <IsConnected>true</IsConnected>
+    <Color>Yellow</Color>
   </MLT_Temp_Probe>
   <BK_Temp_Probe>
-    <Address>0</Address>
+    <Address>165</Address>
     <Temp>0</Temp>
-    <IsConnected>false</IsConnected>
+    <IsConnected>true</IsConnected>
+    <Color>Orange</Color>
   </BK_Temp_Probe>
 </HardwareSettings>

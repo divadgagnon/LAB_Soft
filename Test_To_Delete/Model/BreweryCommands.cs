@@ -47,6 +47,7 @@ namespace LAB.Model
             Messenger.Default.Register<HardwareSettings>(this, "HardwareSettingsUpdate", UpdateHardwareSettings);
             Messenger.Default.Register<Probes>(this, "TemperatureUpdate", TemperatureUpdate_MessageReceived);
             Messenger.Default.Register <bool>(this, "DesignMode", DesignMode_MessageReceived);
+            Messenger.Default.Register<Brewery>(this, "CalibrationMode", CalibrationMode_MessageReceived);
 
             // Initializing Timers
             DisconnectTimer = new DispatcherTimer();
@@ -282,9 +283,17 @@ namespace LAB.Model
         // Volume Update received
         private void VolumeUpdate_MessageReceived(AnalogReturn volSensor)
         {
+
+            if(volSensor.OverByte) { volSensor.Value = volSensor.Value + 255; }
+
             if (hardwareSettings.HLT_Vol_Pin == volSensor.Pin)
             {
-                brewery.HLT.Volume.Value = (volSensor.Value - 63) * 6.73316 * 0.0001022 * Math.PI * 0.2032 * 0.2032 * 1000; // Conversion de analog en pouces cubes en litre (Étalonnage à faire debug seulmeent)
+                if (brewery.CalibrationModeOn) { brewery.HLT.Volume.Value = volSensor.Value; }
+                else
+                {
+                    brewery.HLT.Volume.Value = (volSensor.Value - 63.809)/6.4779;
+
+                }
             }
             else
             {
@@ -293,7 +302,11 @@ namespace LAB.Model
 
             if(hardwareSettings.BK_Vol_Pin == volSensor.Pin)
             {
-                brewery.BK.Volume.Value = (volSensor.Value - 63) * 6.73316 * 0.0001022 * Math.PI * 0.2032 * 0.2032 * 1000; // Étalonnage à faire
+                if (brewery.CalibrationModeOn) { brewery.BK.Volume.Value = volSensor.Value; }
+                else
+                {
+                    brewery.BK.Volume.Value = (volSensor.Value - 63.809) / 6.4779;
+                }
             }
             else
             {
@@ -383,6 +396,11 @@ namespace LAB.Model
         {
             if (_brewery.HLT.Volume.Value != 500) { brewery.HLT.Volume.Value = _brewery.HLT.Volume.Value; }
             if (_brewery.BK.Volume.Value != 500) { brewery.BK.Volume.Value = _brewery.BK.Volume.Value; }
+        }
+
+        private void CalibrationMode_MessageReceived(Brewery _brewery)
+        {
+            brewery.CalibrationModeOn = _brewery.CalibrationModeOn;
         }
 
     }

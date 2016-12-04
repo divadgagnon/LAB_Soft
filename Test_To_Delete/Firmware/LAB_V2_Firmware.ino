@@ -170,9 +170,17 @@
       //
       case 0x05:
       {
-        byte Val = analogRead(Inbyte[1]);
-        byte OutBuffer[3] = {0x05, Inbyte[1], Val};
+        int Val = analogRead(Inbyte[1])/2;
+		bool Over = Val > 255;
+
+		if (Over)
+		{
+			Val = Val - 255;
+		}
+
+        byte OutBuffer[4] = {0x05, Inbyte[1], Val, Over};
         SendPacket(OutBuffer, sizeof(OutBuffer));
+		
         break;
       }
       

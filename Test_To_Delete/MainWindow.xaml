@@ -122,6 +122,13 @@
                     </i:Interaction.Triggers>
                 </MenuItem>
                 <MenuItem Header="Recipe Setup" Template="{DynamicResource MenuSubItem_LABSTYLE}"/>
+                <MenuItem Header="Sensor Calibration" Template="{DynamicResource MenuSubItem_LABSTYLE}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <cmd:EventToCommand Command="{Binding SensorCalibrationClickCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
             </MenuItem>
         </Menu>
 
@@ -235,21 +242,33 @@
                              Background="{DynamicResource MenuBackground}"/>
             </Grid>
             <DockPanel x:Name="ProcessPlotContainer" Grid.Row="2" Grid.ColumnSpan="7" Background="{DynamicResource MenuBackground}" Margin="0,35,0,0" LastChildFill="True">
-                <StackPanel DockPanel.Dock="Left" Margin="15,0,0,0">
+                <StackPanel DockPanel.Dock="Left" Margin="15,0,0,0" Width="400">
                     <Label Content="Air Pumps Status" Foreground="{DynamicResource Principal_Forground}" FontSize="18" FontWeight="Bold"/>
-                    <Grid HorizontalAlignment="Stretch">
-                        <Label Content="HLT Air Pump" Foreground="{DynamicResource Principal_Forground}" FontSize="16" Margin="5,0,15,0" HorizontalAlignment="Left"/>
+                    <Grid HorizontalAlignment="Left" Width="150">
+                        <Label Content="HLT Air Pump" Foreground="{DynamicResource Principal_Forground}" FontSize="16" Margin="5,0,15,0" HorizontalAlignment="Left">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDown">
+                                    <cmd:EventToCommand Command="{Binding AirPump1ClickCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Label>
                         <Ellipse Width="15" Height="15" Stroke="{DynamicResource Principal_Forground}" Fill="{Binding AirPump1Status}" StrokeThickness="1.2" HorizontalAlignment="Right" Margin="0,0,5,0"/>
                     </Grid>
-                    <Grid HorizontalAlignment="Stretch">
-                        <Label Content="BK Air Pump" Foreground="{DynamicResource Principal_Forground}" FontSize="16" Margin="5,0,15,0" HorizontalAlignment="Left"/>
+                    <Grid HorizontalAlignment="Left" Width="150">
+                        <Label Content="BK Air Pump" Foreground="{DynamicResource Principal_Forground}" FontSize="16" Margin="5,0,15,0" HorizontalAlignment="Left">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDown">
+                                    <cmd:EventToCommand Command="{Binding AirPump2ClickCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Label>
                         <Ellipse Width="15" Height="15" Stroke="{DynamicResource Principal_Forground}" Fill="{Binding AirPump2Status}" StrokeThickness="1.2" HorizontalAlignment="Right" Margin="0,0,5,0"/>
                     </Grid>
-                    <Label Content="Mash Timer" Foreground="{DynamicResource Principal_Forground}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
-                    <ListBox x:Name="MashTimerListBox" ItemsSource="{Binding MashTimerDisplay}" Foreground="{DynamicResource Principal_Forground}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0">
+                    <Label Content="{Binding MashHopTimerDisplayTitle}" Foreground="{DynamicResource Principal_Forground}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <ListBox x:Name="MashTimerListBox" ItemsSource="{Binding MashHopTimerDisplay}" Foreground="{DynamicResource Principal_Forground}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" Background="Transparent" BorderThickness="0">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <DockPanel HorizontalAlignment="Center" VerticalAlignment="Stretch" LastChildFill="True" Width="140">
+                                <DockPanel HorizontalAlignment="Center" VerticalAlignment="Stretch" LastChildFill="True" Width="300">
                                     <Label Content="{Binding StepName}" FontSize="16" Foreground="{DynamicResource Principal_Forground}" DockPanel.Dock="Left"/>
                                     <Label Content="{Binding Time}" FontSize="16" Foreground="{DynamicResource Principal_Forground}" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
                                 </DockPanel>

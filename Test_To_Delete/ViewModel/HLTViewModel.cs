@@ -61,7 +61,7 @@ namespace LAB.ViewModel
         {
             get
             {
-                return Math.Round(brewery.HLT.Volume.Value, 1) + " liters";
+                return Math.Round(brewery.HLT.Volume.Value, 1) +""; // + " liters";
             }
         }
 

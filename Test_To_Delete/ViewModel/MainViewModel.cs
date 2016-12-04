@@ -28,6 +28,9 @@ namespace LAB.ViewModel
         public RelayCommand SemiAutoModeClickCommand { get; private set; }
         public RelayCommand ManualModeClickCommand { get; private set; }
         public RelayCommand<Brewery.valve> ValveClickCommand { get; private set; }
+        public RelayCommand SensorCalibrationClickCommand { get; private set; }
+        public RelayCommand AirPump1ClickCommand { get; private set; }
+        public RelayCommand AirPump2ClickCommand { get; private set; }
 
         // Define Model instance names
         public BreweryCommands breweryCommand;
@@ -36,6 +39,7 @@ namespace LAB.ViewModel
         public Process process;
         public Probes probes;
         public UserAlarm userAlarm;
+        public Ingredients ingredients;
 
         // Define Timers
         DispatcherTimer UpdateTempSensorTimer;
@@ -44,6 +48,7 @@ namespace LAB.ViewModel
         DispatcherTimer PrimingTimer;
         DispatcherTimer MashStepTimer;
         DispatcherTimer BoilTimer;
+        DispatcherTimer HopScheduleTimer;
 
         // Define Media Player
         MediaPlayer Player;
@@ -57,7 +62,7 @@ namespace LAB.ViewModel
 
         // Define State Machine variables
         bool DesignMode;
-        bool MashStepComplete;
+        bool HopAdditionComplete;
         bool FirstMashStep;
         bool FirstSparge;
         bool BoilOverSent;
@@ -65,7 +70,9 @@ namespace LAB.ViewModel
         double HLTStartVolume;
         double MLTStartVolume;
         int step;
+        int CurrentHopAddition;
         TimeSpan RemainingTime;
+        TimeSpan BoilRemainingTime;
         TimeSpan StepStartTime;
         TimeSpan StepEndTime;
         TimeSpan BoilStartTime;
@@ -82,7 +89,8 @@ namespace LAB.ViewModel
         public const string AutomationModeCheckedPropertyName = "AutomationModeChecked";
         public const string AirPump1StatusPropertyName = "AirPump1Status";
         public const string AirPump2StatusPropertyName = "AirPump2Status";
-        public const string MashTimerDisplayPropertyName = "MashTimerDisplay";
+        public const string MashHopTimerDisplayPropertyName = "MashHopTimerDisplay";
+        public const string MashHopTimerDisplayTitlePropertyName = "MashHopTimerDisplayTitle";
 
         // Define Bindable Properties
         public string ConnectionStatus
@@ -105,6 +113,7 @@ namespace LAB.ViewModel
         { 
             get
             {
+                RaisePropertyChanged(MashHopTimerDisplayTitlePropertyName);
                 Messenger.Default.Send<BreweryState>(breweryState);
                 switch (breweryState)
                 {
@@ -154,6 +163,10 @@ namespace LAB.ViewModel
                             {
                                 return BreweryStatusString + "Semi-Automatic Control";
                             }
+                        }
+                    case BreweryState.CalibrationMode:
+                        {
+                            return BreweryStatusString + "Volume Sensor Calibration";
                         }
                 }
 
@@ -214,14 +227,31 @@ namespace LAB.ViewModel
             }
         }
 
-        // Mash steps timer display text property
-        ObservableCollection<MashTimerDisplayItem> MashStepDisplayList = new ObservableCollection<MashTimerDisplayItem>();
-
-        public ObservableCollection<MashTimerDisplayItem> MashTimerDisplay
+        // Mash and Hop Timer Title
+        public string MashHopTimerDisplayTitle
         {
             get
             {
-                MashStepDisplayList.Clear();
+                if (breweryState == BreweryState.Sparge || 
+                    breweryState == BreweryState.Boil || 
+                    breweryState == BreweryState.Chill || 
+                    breweryState == BreweryState.Fermenter_Transfer)
+                {
+                    return "Hop Schedule";
+                }
+
+                else { return "Mash Steps"; }
+            }
+        }
+
+        // Mash steps timer display text property
+        ObservableCollection<MashTimerDisplayItem> MashHopStepDisplayList = new ObservableCollection<MashTimerDisplayItem>();
+
+        public ObservableCollection<MashTimerDisplayItem> MashHopTimerDisplay
+        {
+            get
+            {
+                MashHopStepDisplayList.Clear();
 
                 if(breweryState == BreweryState.Mash)
                 {
@@ -234,25 +264,49 @@ namespace LAB.ViewModel
 
                         else if (process.MashSteps[step] == Step)
                         {
-                            MashStepDisplayList.Add(new MashTimerDisplayItem() { StepName = Step.Name, Time = RemainingTime.Minutes + " : " + String.Format("{0:00}", RemainingTime.Seconds) });
+                            MashHopStepDisplayList.Add(new MashTimerDisplayItem() { StepName = Step.Name, Time = RemainingTime.Minutes + ":" + String.Format("{0:00}", RemainingTime.Seconds) });
                         }
                         else
                         {
-                            MashStepDisplayList.Add(new MashTimerDisplayItem() { StepName = Step.Name, Time = StepTimeSpan.Minutes + ":" + String.Format("{0:00}", StepTimeSpan.Seconds) });
+                            MashHopStepDisplayList.Add(new MashTimerDisplayItem() { StepName = Step.Name, Time = StepTimeSpan.Minutes + ":" + String.Format("{0:00}", StepTimeSpan.Seconds) });
                         }
                     }
                 }
+
+                else if(breweryState == BreweryState.Sparge || breweryState == BreweryState.Chill)
+                {
+                    foreach (Ingredients.Hop hop in ingredients.Hops)
+                    {
+                        TimeSpan hopBoilTime = TimeSpan.FromMinutes(hop.BoilTime);
+                        MashHopStepDisplayList.Add(new MashTimerDisplayItem() { StepName = hop.Name, Time = hopBoilTime.Minutes + ":" + String.Format("{0:00}", hopBoilTime.Seconds) });
+                    }
+                }
+
+                else if (breweryState == BreweryState.Boil && BoilTimer.IsEnabled && !BoilComplete)
+                {
+                    foreach(Ingredients.Hop hop in ingredients.Hops)
+                    {
+                        if (ingredients.Hops.IndexOf(hop) < CurrentHopAddition) { }
+
+                        else
+                        {
+                            TimeSpan hopRemainingTime = BoilEndTime.Add(-TimeSpan.FromMinutes(hop.BoilTime)-DateTime.Now.TimeOfDay);
+                            MashHopStepDisplayList.Add(new MashTimerDisplayItem() { StepName = hop.Name, Time = hopRemainingTime.Minutes + ":" + String.Format("{0:00}", hopRemainingTime.Seconds) });
+                        }
+                    }
+                }
+
                 else
                 {
                     foreach (Process.MashStep Step in process.MashSteps)
                     {
-                        TimeSpan StepTimeSpan = TimeSpan.FromMinutes(Step.Time);
+                            TimeSpan StepTimeSpan = TimeSpan.FromMinutes(Step.Time);
 
-                        MashStepDisplayList.Add(new MashTimerDisplayItem() { StepName = Step.Name, Time = StepTimeSpan.Minutes + ":" + String.Format("{0:00}", StepTimeSpan.Seconds) });
+                            MashHopStepDisplayList.Add(new MashTimerDisplayItem() { StepName = Step.Name, Time = StepTimeSpan.Minutes + ":" + String.Format("{0:00}", StepTimeSpan.Seconds) }); 
                     }
                 }
 
-                return MashStepDisplayList;
+                return MashHopStepDisplayList;
             }
         }
 
@@ -270,6 +324,7 @@ namespace LAB.ViewModel
             process = new Process();
             probes = new Probes();
             userAlarm = new UserAlarm();
+            ingredients = new Ingredients();
 
             // Initializing UI variables
             automationModeChecked = new List<bool>(new bool[] { true, false, false });
@@ -285,6 +340,9 @@ namespace LAB.ViewModel
             SemiAutoModeClickCommand = new RelayCommand(semiAutomaticModeClickCommand);
             ManualModeClickCommand = new RelayCommand(manualModeClickCommand);
             ValveClickCommand = new RelayCommand<Brewery.valve>(valveClickCommand);
+            SensorCalibrationClickCommand = new RelayCommand(sensorCalibrationClickCommand);
+            AirPump1ClickCommand = new RelayCommand(airPump1ClickCommand);
+            AirPump2ClickCommand = new RelayCommand(airPump2ClickCommand);
 
             // Initializing Timers
             UpdateTempSensorTimer = new DispatcherTimer();
@@ -293,18 +351,20 @@ namespace LAB.ViewModel
             PrimingTimer = new DispatcherTimer();
             MashStepTimer = new DispatcherTimer();
             BoilTimer = new DispatcherTimer();
+            HopScheduleTimer = new DispatcherTimer();
 
             // Initializing Sound Player
             Player = new MediaPlayer();
 
             // Initializing Machine State Variables
-            MashStepComplete = false;
+            HopAdditionComplete = false;
             FirstMashStep = true;
             FirstSparge = true;
             BoilOverSent = false;
             BoilComplete = false;
             StepStartTime = new TimeSpan();
             RemainingTime = new TimeSpan();
+            BoilRemainingTime = new TimeSpan();
             StepEndTime = new TimeSpan();
 
             // Initializing the brewery State
@@ -337,6 +397,7 @@ namespace LAB.ViewModel
             Messenger.Default.Register<Brewery.vessel>(this, "BurnerOverride", BurnerOverride_MessageReceived);
             Messenger.Default.Register<Brewery.pump>(this, "PumpOverride", PumpOverride_MessageReceived);
             Messenger.Default.Register<ObservableCollection<Brewery.valve>>(this, ValveUpdate_MessageReceived);
+            Messenger.Default.Register<Ingredients>(this, (Ingredients _ingredients) => { ingredients = _ingredients; });
         }
 
         #endregion
@@ -347,6 +408,7 @@ namespace LAB.ViewModel
         {
             switch(breweryState)
             {
+                #region StandBy
                 case BreweryState.StandBy:
                     {
                         if(process !=null)
@@ -367,7 +429,9 @@ namespace LAB.ViewModel
                         }
                         break;
                     }
+                #endregion
 
+                #region HLT Fill
                 case BreweryState.HLT_Fill:
                     {
                         // Set the fill set point and send the data to the HLT view
@@ -397,7 +461,9 @@ namespace LAB.ViewModel
 
                         break;
                     }
+                #endregion
 
+                #region Strike Heat
                 case BreweryState.Strike_Heat:
                     {
                         // Send Message to light the pilots
@@ -422,7 +488,9 @@ namespace LAB.ViewModel
                         }
                         break;
                     }
+                #endregion
 
+                #region Strike Transfer
                 case BreweryState.Strike_Transfer:
                     {
                         // Define SetPoint for initial MLT volume (dough in)
@@ -488,7 +556,9 @@ namespace LAB.ViewModel
                         }
                         break;
                     }
+                #endregion
 
+                #region Dough In
                 case BreweryState.DoughIn:
                     {
                         // Set the Valve configuration request to Mash Recirculation
@@ -528,7 +598,9 @@ namespace LAB.ViewModel
                         }
                         break;
                     }
+                #endregion
 
+                #region Mash
                 case BreweryState.Mash:
                     {
                         // If first iteration start mash timer
@@ -546,13 +618,13 @@ namespace LAB.ViewModel
                         }
 
                         // If the mash step is completed increment
-                        if(MashStepComplete)
+                        if(HopAdditionComplete)
                         {
                             // Set the new mash step as incomplete
-                            MashStepComplete = false;
+                            HopAdditionComplete = false;
 
                             // Check if all steps are completed
-                            if (process.MashSteps.Count <= step+1)
+                            if (process.MashSteps.Count < step+1)
                             {
                                 breweryState = BreweryState.Sparge;
                                 RaisePropertyChanged(BreweryStateDisplayPropertyName);
@@ -589,7 +661,9 @@ namespace LAB.ViewModel
 
                         break;
                     }
+                #endregion
 
+                #region Sparge
                 case BreweryState.Sparge:
                     {
                         // Send Sparging Message
@@ -641,10 +715,11 @@ namespace LAB.ViewModel
                         // Monitor HLT Sparge volume
                         if (brewery.HLT.Volume.Value <= HLTStartVolume-process.Sparge.Volume)
                         {
+                            breweryCommand.ActivateAirPump1(RelayState.Off);
+
                             if (brewery.Pump1.IsOn)
                             {
                                 breweryCommand.ActivatePump1(RelayState.Off);
-                                breweryCommand.ActivateAirPump1(RelayState.Off);
                             }
 
                             if(brewery.HLT.Volume.Value <= 10 && brewery.HLT.Burner.IsOn)
@@ -705,7 +780,9 @@ namespace LAB.ViewModel
 
                         break;
                     }
+                #endregion
 
+                #region Boil
                 case BreweryState.Boil:
                     {
                         // Hold boil temp in BK
@@ -737,13 +814,45 @@ namespace LAB.ViewModel
                             BoilEndTime = StepStartTime.Add(TimeSpan.FromMinutes(process.Boil.Time));
 
                             // Start the step timer
-                            BoilTimer.Interval = TimeSpan.FromMilliseconds(500);
+                            BoilTimer.Interval = TimeSpan.FromMilliseconds(250);
                             BoilTimer.Tick += BoilTimer_Tick;
                             BoilTimer.Start();
+
+                            // Set the Hop schedule timer variables
+                            StepStartTime = DateTime.Now.TimeOfDay;
+                            StepEndTime = BoilEndTime.Add(-TimeSpan.FromMinutes(ingredients.Hops[CurrentHopAddition].BoilTime));
+
+                            // Start the Hop Schedule Timer
+                            HopScheduleTimer.Interval = TimeSpan.FromMilliseconds(250);
+                            HopScheduleTimer.Tick += HopScheduleTimer_Tick;
+                            HopScheduleTimer.Start();
+                        }
+
+                        // If the current hop addition is completed increment
+                        if (HopAdditionComplete)
+                        {
+                            // Set the new hop schedule as incomplete
+                            HopAdditionComplete = false;
+
+                            // Check if all steps are completed
+                            if (ingredients.Hops.Count < CurrentHopAddition + 1)
+                            {
+                                HopScheduleTimer.Stop();
+                                return;
+                            }
+
+                            // Get the step start and end time
+                            StepStartTime = DateTime.Now.TimeOfDay;
+                            StepEndTime = BoilEndTime.Add(-TimeSpan.FromMinutes(ingredients.Hops[CurrentHopAddition].BoilTime));
+
+                            // Start the step timer
+                            MashStepTimer.Interval = TimeSpan.FromMilliseconds(250);
+                            MashStepTimer.Tick += MashStepTimer_Tick;
+                            MashStepTimer.Start();
                         }
 
                         // Check if boil is complete
-                        if(BoilComplete)
+                        if (BoilComplete)
                         {
                             // Turn off BK burner
                             breweryCommand.HoldTemp(Vessels.BK, 0);
@@ -756,7 +865,9 @@ namespace LAB.ViewModel
 
                         break;
                     }
+                #endregion
 
+                #region Chill
                 case BreweryState.Chill:
                     {
                         // Send chill temperature info
@@ -791,7 +902,9 @@ namespace LAB.ViewModel
 
                         break;
                     }
+                #endregion
 
+                #region Fermenter Transfer
                 case BreweryState.Fermenter_Transfer:
                     {
                         // Request Valve Config
@@ -818,6 +931,7 @@ namespace LAB.ViewModel
 
                         break;
                     }
+                    #endregion
             }
         }
 
@@ -894,6 +1008,31 @@ namespace LAB.ViewModel
             }
 
             RaisePropertyChanged(AirPump2StatusPropertyName);
+        }
+
+        #endregion
+
+        #region Calibration StateMachine
+
+        private void RunCalibrationStateMachine()
+        {
+            switch(brewery.Calibration.State)
+            {
+                case CalibrationState.StandBy:
+                    {
+                        return;
+                    }
+                case CalibrationState.Setup:
+                    {
+                        // Turn on air pump 1 for Level monitoring
+                        if (!brewery.AirPump1.IsOn)
+                        {
+                            breweryCommand.ActivateAirPump1(RelayState.On);
+                        }
+
+                        return;
+                    }
+            }
         }
 
         #endregion
@@ -995,22 +1134,36 @@ namespace LAB.ViewModel
         {
             // Increment ElapsedTime
             RemainingTime = StepEndTime - DateTime.Now.TimeOfDay;
-            RaisePropertyChanged(MashTimerDisplayPropertyName);
+            RaisePropertyChanged(MashHopTimerDisplayPropertyName);
 
             // Check if mash step is completed
             if (DateTime.Now.TimeOfDay >= StepEndTime)
             {
-                MashStepComplete = true;
+                HopAdditionComplete = true;
                 RemainingTime = new TimeSpan();
-                if(process.MashSteps.Count == step+1) { return; }
                 step++;
+            }
+        }
+
+        private void HopScheduleTimer_Tick(object sender, EventArgs e)
+        {
+            // Increment ElapsedTime
+            RemainingTime = StepEndTime - DateTime.Now.TimeOfDay;
+            RaisePropertyChanged(MashHopTimerDisplayPropertyName);
+
+            // Check if mash step is completed
+            if (RemainingTime <= TimeSpan.FromSeconds(0))
+            {
+                HopAdditionComplete = true;
+                RemainingTime = new TimeSpan();
+                CurrentHopAddition++;
             }
         }
 
         private void BoilTimer_Tick(object sender, EventArgs e)
         {
             // Increment ElapsedTime
-            RemainingTime = BoilEndTime - DateTime.Now.TimeOfDay;
+            BoilRemainingTime = BoilEndTime - DateTime.Now.TimeOfDay;
 
             // Check if Boil is Completed
             if(BoilEndTime <= DateTime.Now.TimeOfDay)
@@ -1026,7 +1179,7 @@ namespace LAB.ViewModel
             userAlarm.ProcessData = process;
             userAlarm.VisualAlarm = false;
             userAlarm.CurrentState = breweryState;
-            userAlarm.RemainingTime = RemainingTime;
+            userAlarm.RemainingTime = BoilRemainingTime;
             userAlarm.IsActive = true;
 
             Messenger.Default.Send<UserAlarm>(userAlarm);
@@ -1169,6 +1322,15 @@ namespace LAB.ViewModel
             Messenger.Default.Send(brewery.Valves[_Valve.Number]);
         }
 
+        private void sensorCalibrationClickCommand()
+        {
+            // Make sure a session is not currently running
+            if(process.Session.IsStarted) { return; }
+            brewery.CalibrationModeOn = true;
+            Messenger.Default.Send<Brewery>(brewery, "CalibrationMode");
+            RunCalibrationStateMachine();
+        }
+
         // Gets executed before the application shuts down to close the comPort
         private void mainClosing()
         {
@@ -1189,7 +1351,7 @@ namespace LAB.ViewModel
         private void Process_MessageReceived(Process _process)
         {
             process = _process;
-            RaisePropertyChanged(MashTimerDisplayPropertyName);
+            RaisePropertyChanged(MashHopTimerDisplayPropertyName);
 
             // Start Session if session start was already requested
             if(process.Session.StartRequested) { startBrewSessionClickCommand(); }
