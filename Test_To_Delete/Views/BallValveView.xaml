@@ -5,13 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ignore="http://www.galasoft.ch/ignore"
         mc:Ignorable="d ignore"
-        x:Name="BallValveControl"
-        >
+        x:Name="BallValveControl">
 
     <Canvas xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="Layer_1" Width="800" Height="600" Canvas.Left="0" Canvas.Top="0">
             <Path Width="217.667" Height="394.333" Canvas.Left="301.833" Canvas.Top="125.5" Stretch="Fill" StrokeThickness="7" StrokeLineJoin="Round" Stroke="#FFA8A8A8" Fill="#FF333333" Data="F1 M 310.333,129L 511,129C 513.761,129 516,131.239 516,134L 516,511.333C 516,514.095 513.761,516.333 511,516.333L 310.333,516.333C 307.572,516.333 305.333,514.095 305.333,511.333L 305.333,134C 305.333,131.239 307.572,129 310.333,129 Z "/>
-            <Ellipse x:Name="Indicator" Width="246" Height="233" Canvas.Left="288" Canvas.Top="205" Stretch="Fill" StrokeThickness="7" StrokeLineJoin="Round" Stroke="#FFA8A8A8"/>
-            <Path x:Name="Handle" Width="399.333" Height="79" Canvas.Left="30.8333" Canvas.Top="283.5" Stretch="Fill" StrokeThickness="7" StrokeLineJoin="Round" Stroke="#FF8F0000" Data="F1 M 39.3333,287L 421.667,287C 424.428,287 426.667,289.239 426.667,292L 426.667,354C 426.667,356.761 424.428,359 421.667,359L 39.3333,359C 36.5719,359 34.3333,356.761 34.3333,354L 34.3333,292C 34.3333,289.239 36.5719,287 39.3333,287 Z " RenderTransformOrigin="0.5,0.5"/>
+            <Ellipse x:Name="Indicator" Fill="{Binding ElementName=BallValveControl, Path=HandleColor}" Width="246" Height="233" Canvas.Left="288" Canvas.Top="205" Stretch="Fill" StrokeThickness="7" StrokeLineJoin="Round" Stroke="#FFA8A8A8"/>
+        <Path x:Name="Handle" Fill="{Binding Path=HandleColor, ElementName=BallValveControl}" Stroke="{Binding ElementName=BallValveControl, Path=HandleColor}" RenderTransform="{Binding ElementName=BallValveControl, Path=Rotation}" Width="399.333" Height="79" Canvas.Left="30.8333" Canvas.Top="283.5" Stretch="Fill" StrokeThickness="7" StrokeLineJoin="Round" Data="F1 M 39.3333,287L 421.667,287C 424.428,287 426.667,289.239 426.667,292L 426.667,354C 426.667,356.761 424.428,359 421.667,359L 39.3333,359C 36.5719,359 34.3333,356.761 34.3333,354L 34.3333,292C 34.3333,289.239 36.5719,287 39.3333,287 Z " RenderTransformOrigin="0.5,0.5"/>
         </Canvas>
 
 </UserControl>

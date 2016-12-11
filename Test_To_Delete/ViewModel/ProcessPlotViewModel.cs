@@ -28,9 +28,18 @@ namespace LAB.ViewModel
         public int MaxValue { get; private set; }
         private int XAxisScale { get; set; } = 600;
 
+        // Define Relay commands for chart controls
+        public RelayCommand HLTChartClickCommand;
+        public RelayCommand MLTChartCLickCommand;
+        public RelayCommand BKChartClickCommand;
+
         // Define private variables
-        private double currentTemp;
-        private double currentSetPoint;
+        private double currentHLTTemp;
+        private double currentHLTSetPoint;
+        private double currentMLTTemp;
+        private double currentMLTSetPoint;
+        private double currentBKTemp;
+        private double currentBKSetPoint;
         private TimeSpan startTime;
         private TimeSpan currentTime;
         private BreweryState currentState = BreweryState.StandBy;
@@ -61,11 +70,14 @@ namespace LAB.ViewModel
             
             dataSeries.Add(HLTTemp);
             dataSeries.Add(HLTTempSetPoint);
+            
+            HLTTemp.Values.Add(0.0);
+            HLTTempSetPoint.Values.Add(0.0);
             startTime = new TimeSpan();
             currentTime = new TimeSpan();
 
-            HLTTemp.Values.Add(currentTemp);
-            HLTTempSetPoint.Values.Add(currentSetPoint);
+            HLTTemp.Values.Add(currentHLTTemp);
+            HLTTempSetPoint.Values.Add(currentHLTSetPoint);
 
             XFormatter = val => (val / 10).ToString();
 
@@ -80,6 +92,8 @@ namespace LAB.ViewModel
                 startTime = DateTime.Now.TimeOfDay;
                 Messenger.Default.Register<Brewery>(this, "TemperatureUpdate", TemperatureUpdate_MessageReceived);
                 Messenger.Default.Register<Brewery>(this, "HLTTempSetPointUpdate", HLTTempSetPointUpdate_MessageReceived);
+                Messenger.Default.Register<Brewery>(this, "MLTTempSetPointUpdate", MLTTempSetPointUpdate_MessageReceived);
+                Messenger.Default.Register<Brewery>(this, "BKTempSetPointUpdate", BKTempSetPointUpdate_MessageReceived);
 
                 UpdateTimer.Interval = TimeSpan.FromSeconds(6);
                 UpdateTimer.Tick += UpdateTimer_Tick;
@@ -100,19 +114,33 @@ namespace LAB.ViewModel
                 RaisePropertyChanged(MinValuePropertyName);
             }
 
-            HLTTemp.Values.Add(currentTemp);
-            HLTTempSetPoint.Values.Add(currentSetPoint);
+            HLTTemp.Values.Add(currentHLTTemp);
+            HLTTempSetPoint.Values.Add(currentHLTSetPoint);
         }
 
         private void TemperatureUpdate_MessageReceived(Brewery _brewery)
         {
-            currentTemp = _brewery.HLT.Temp.Value;
+            currentHLTTemp = _brewery.HLT.Temp.Value;
+            currentMLTTemp = _brewery.MLT.Temp.Value;
+            currentBKTemp = _brewery.BK.Temp.Value;
             currentTime = DateTime.Now.TimeOfDay - startTime;
         }
 
         private void HLTTempSetPointUpdate_MessageReceived(Brewery _brewery)
         {
-            currentSetPoint = _brewery.HLT.Temp.SetPoint;
+            currentHLTSetPoint = _brewery.HLT.Temp.SetPoint;
+            currentTime = DateTime.Now.TimeOfDay - startTime;
+        }
+
+        private void MLTTempSetPointUpdate_MessageReceived(Brewery _brewery)
+        {
+            currentMLTSetPoint = _brewery.MLT.Temp.Value;
+            currentTime = DateTime.Now.TimeOfDay - startTime;
+        }
+
+        private void BKTempSetPointUpdate_MessageReceived(Brewery _brewery)
+        {
+            currentBKTemp = _brewery.BK.Temp.Value;
             currentTime = DateTime.Now.TimeOfDay - startTime;
         }
     }

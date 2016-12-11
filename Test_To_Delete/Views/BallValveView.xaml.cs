@@ -12,7 +12,7 @@ namespace LAB.Views
     /// <summary>
     /// Description for BallValveView.
     /// </summary>
-    public partial class BallValveView
+    public partial class BallValveView : UserControl, INotifyPropertyChanged
     {
         // Timers
         public DispatcherTimer FlashingIndicatorTimer;
@@ -21,45 +21,84 @@ namespace LAB.Views
         private bool ActiveIndicator;
 
         // Private Variables
-        private SolidColorBrush IndicatorColor;
-        private SolidColorBrush OpenRequestColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF218512"));
-        private SolidColorBrush CloseRequestColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8F0000"));
-        private SolidColorBrush InactiveColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFA8A8A8"));
+        public SolidColorBrush IndicatorColor;
+        public SolidColorBrush OpenRequestColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF218512"));
+        public SolidColorBrush CloseRequestColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8F0000"));
+        public SolidColorBrush InactiveColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFA8A8A8"));
 
-        // Control Properties
-        private bool isOpen;
+        // Private variables
+        private RotateTransform rotation;
+        private SolidColorBrush handleColor;
+
+        // Property Changed event defintion
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // External Control Properties
         public bool IsOpen
         {
-            set
-            {
-                isOpen = value;
-                HandlePositionUpdate();
-            }
-            get
-            {
-                return isOpen;
-            }
+            set { SetValue(IsOpenProperty, value); }
+            get { return (bool)GetValue(IsOpenProperty); }
         }
 
-        private bool openRequest;
         public bool OpenRequest
         {
-            set
+            get { return (bool)GetValue(OpenRequestProperty); }
+            set { SetValue(OpenRequestProperty, value); }
+        }
+
+        public bool CloseRequest
+        {
+            get { return (bool)GetValue(CloseRequestProperty); }
+            set { SetValue(CloseRequestProperty, value); }
+        }
+
+        // Dependency Property Definitions
+        public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register("IsOpen", typeof(bool), typeof(BallValveView), new PropertyMetadata(false, IsOpenPropertyCallBack));
+        public static readonly DependencyProperty OpenRequestProperty = DependencyProperty.Register("OpenRequest", typeof(bool), typeof(BallValveView), new PropertyMetadata(false, OpenRequestPropertyCallBack));
+        public static readonly DependencyProperty CloseRequestProperty = DependencyProperty.Register("CloseRequest", typeof(bool), typeof(BallValveView), new PropertyMetadata(false, CloseRequestPropertyCallBack));
+
+        // Dependency Properties Callbacks
+        private static void IsOpenPropertyCallBack(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            BallValveView _BallValveView = o as BallValveView;
+
+            if(_BallValveView != null)
             {
-                openRequest = value;
-                if(value) { ActionRequest(); }
-                else { FlashingIndicatorTimer.Stop(); HandlePositionUpdate(); }
+                _BallValveView.HandlePositionUpdate();
             }
         }
 
-        private bool closeRequest;
-        public bool CloseRequest
+        private static void OpenRequestPropertyCallBack(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
-            set
+            BallValveView _BallValveView = o as BallValveView;
+
+            if (_BallValveView != null)
             {
-                closeRequest = value;
-                ActionRequest();
+                if (_BallValveView.OpenRequest) { _BallValveView.ActionRequest(); }
+                else { _BallValveView.FlashingIndicatorTimer.Stop(); _BallValveView.HandlePositionUpdate(); }
             }
+        }
+
+        private static void CloseRequestPropertyCallBack(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            BallValveView _BallValveView = o as BallValveView;
+
+            if (_BallValveView != null)
+            {
+                if (_BallValveView.CloseRequest) { _BallValveView.ActionRequest(); }
+                else { _BallValveView.FlashingIndicatorTimer.Stop(); _BallValveView.HandlePositionUpdate(); }
+            }
+        }
+
+        // Internal Control Properties
+        public RotateTransform Rotation
+        {
+            get { return rotation; }
+        }
+
+        public SolidColorBrush HandleColor
+        {
+            get { return handleColor; }
         }
 
         #region Constructor
@@ -67,15 +106,14 @@ namespace LAB.Views
         public BallValveView()
         {
             InitializeComponent();
-            this.DataContext = this;
-
-            // Message Registering
-            Messenger.Default.Register<Brewery.valve>(this, ValveUpdate_MessageReceived);
 
             // Timers
             FlashingIndicatorTimer = new DispatcherTimer();
             FlashingIndicatorTimer.Interval = TimeSpan.FromMilliseconds(1000);
             FlashingIndicatorTimer.Tick += FlashingIndicatorTimer_Tick;
+
+            // Initialize local variables
+            rotation = new RotateTransform();
 
             // Set Default Colors
             HandlePositionUpdate();
@@ -86,18 +124,16 @@ namespace LAB.Views
         {
             if(ActiveIndicator)
             {
-                Handle.Fill = InactiveColor;
-                Handle.Stroke = InactiveColor;
-                Indicator.Fill = InactiveColor;
+                handleColor = InactiveColor;
                 ActiveIndicator = false;
             }
             else
             {
-                Handle.Fill = IndicatorColor;
-                Handle.Stroke = IndicatorColor;
-                Indicator.Fill = IndicatorColor;
+                handleColor = IndicatorColor;
                 ActiveIndicator = true;
             }
+
+            RaisePropertyChanged("HandleColor");
         }
 
         #endregion
@@ -106,35 +142,32 @@ namespace LAB.Views
 
         private void HandlePositionUpdate()
         {
-            RotateTransform rotation = new RotateTransform();
             rotation.CenterX = 180;
 
-            if(isOpen)
+            if(IsOpen)
             {
                 rotation.Angle = -90;
-                Indicator.Fill =OpenRequestColor;
-                Handle.Fill = OpenRequestColor;
-                Handle.Stroke = OpenRequestColor;
+                handleColor = OpenRequestColor;
             }
             else
             {
                 rotation.Angle = 0;
-                Indicator.Fill = CloseRequestColor;
-                Handle.Fill = CloseRequestColor;
-                Handle.Stroke = CloseRequestColor;
+                handleColor = CloseRequestColor;
             }
 
-            Handle.RenderTransform = rotation;
+            RaisePropertyChanged("Rotation");
+            RaisePropertyChanged("HandleColor");
+
         }
 
         private void ActionRequest()
         {
-            if (openRequest)
+            if (OpenRequest)
             {
                 IndicatorColor = OpenRequestColor;
                 FlashingIndicatorTimer.Start();
             }
-            if(closeRequest)
+            if(CloseRequest)
             {
                 IndicatorColor = CloseRequestColor;
                 FlashingIndicatorTimer.Start();
@@ -143,14 +176,9 @@ namespace LAB.Views
 
         #endregion
 
-        private void ValveUpdate_MessageReceived(Brewery.valve valve)
+        private void RaisePropertyChanged(string propertyName)
         {
-            if (valve.Name == Name)
-            {
-                IsOpen = valve.IsOpen;
-                OpenRequest = valve.Request.Open;
-                CloseRequest = valve.Request.Close;
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
     }

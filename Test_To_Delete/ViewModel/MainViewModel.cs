@@ -30,6 +30,9 @@ namespace LAB.ViewModel
         public RelayCommand<Brewery.valve> ValveClickCommand { get; private set; }
         public RelayCommand AirPump1ClickCommand { get; private set; }
         public RelayCommand AirPump2ClickCommand { get; private set; }
+        public RelayCommand HLTPlotButtonClickCommand { get; private set; }
+        public RelayCommand MLTPlotButtonClickCommand { get; private set; }
+        public RelayCommand BKPLotButtonClickCommand { get; private set; }
 
         // Define Model instance names
         public BreweryCommands breweryCommand;
@@ -394,7 +397,7 @@ namespace LAB.ViewModel
             Messenger.Default.Register<Brewery>(this, "BKTempSetPointReachedUpdate", BKTempSetPointReachedUpdate_MessageReceived);
             Messenger.Default.Register<Brewery.vessel>(this, "BurnerOverride", BurnerOverride_MessageReceived);
             Messenger.Default.Register<Brewery.pump>(this, "PumpOverride", PumpOverride_MessageReceived);
-            Messenger.Default.Register<ObservableCollection<Brewery.valve>>(this, ValveUpdate_MessageReceived);
+            Messenger.Default.Register<Brewery.valve>(this, ValveUpdate_MessageReceived);
             Messenger.Default.Register<Ingredients>(this, (Ingredients _ingredients) => { ingredients = _ingredients; });
 
             // Get and set the saved hardware settings on startup
@@ -499,13 +502,13 @@ namespace LAB.ViewModel
                         Messenger.Default.Send<Brewery>(brewery, "MLTVolumeSetPointUpdate");
                         Messenger.Default.Send<Brewery>(brewery, "MLTVolumeSetPointReachedUpdate");
 
-                        // Confirm the correct Valves operations are complete before starting the pump
+                        //Confirm the correct Valves operations are complete before starting the pump
                         if (!(brewery.ValveConfig.ConfigSet == ValveConfigs.Strike_Transfer))
                         {
                             brewery.ValveConfig.Set(ValveConfigs.Strike_Transfer, brewery.Valves);
                             brewery.ValveConfig.ConfigSet = ValveConfigs.Strike_Transfer;
                         }
-                        
+
                         // Hold Strike Temp
                         breweryCommand.HoldTemp(Vessels.HLT, process.Strike.Temp);
 
@@ -563,7 +566,7 @@ namespace LAB.ViewModel
                 case BreweryState.DoughIn:
                     {
                         // Set the Valve configuration request to Mash Recirculation
-                        if(!(brewery.ValveConfig.ConfigSet == ValveConfigs.Mash_Recirc))
+                        if (!(brewery.ValveConfig.ConfigSet == ValveConfigs.Mash_Recirc))
                         {
                             brewery.ValveConfig.Set(ValveConfigs.Mash_Recirc, brewery.Valves);
                             brewery.ValveConfig.ConfigSet = ValveConfigs.Mash_Recirc;
@@ -668,7 +671,7 @@ namespace LAB.ViewModel
                 case BreweryState.Sparge:
                     {
                         // Send Sparging Message
-                        if(brewery.ValveConfig.ConfigSet != ValveConfigs.Fly_Sparge)
+                        if (brewery.ValveConfig.ConfigSet != ValveConfigs.Fly_Sparge)
                         {
                             brewery.ValveConfig.Set(ValveConfigs.Fly_Sparge, brewery.Valves);
                             brewery.ValveConfig.ConfigSet = ValveConfigs.Fly_Sparge;
@@ -1187,7 +1190,7 @@ namespace LAB.ViewModel
                 UpdateVolSensorTimer.Stop();
 
                 // Reset all relays to off state
-                breweryCommand.SetPinModes();
+                breweryCommand.PreDisconnect();
                 return;
             }
 
@@ -1206,7 +1209,7 @@ namespace LAB.ViewModel
 
             // Check if Design Session and skip the sensor update timers if true
             if (DesignMode) { goto SkipDAQTimers; }
-
+            
             // Setting Temperature Timer Properties
             UpdateTempSensorTimer.Interval = TimeSpan.FromMilliseconds(hardwareSettings.TempRefreshRate);
             UpdateTempSensorTimer.Tick += UpdateTempSensorTimer_Tick;
@@ -1296,6 +1299,7 @@ namespace LAB.ViewModel
             if(_Valve == null) { throw new Exception("Valve Paramater was null"); }
             brewery.Valves[_Valve.Number].IsOpen = !_Valve.IsOpen;
             Messenger.Default.Send(brewery.Valves[_Valve.Number]);
+            RaisePropertyChanged("ValveList");
         }
 
         // Gets executed before the application shuts down to close the comPort
@@ -1481,9 +1485,10 @@ namespace LAB.ViewModel
         }
 
         // Valve Update
-        private void ValveUpdate_MessageReceived(ObservableCollection<Brewery.valve> _ValveList)
+        private void ValveUpdate_MessageReceived(Brewery.valve _Valve)
         {
-            brewery.Valves = _ValveList;
+            brewery.Valves[_Valve.Number] = _Valve;
+            RaisePropertyChanged("ValveList");
         }
 
         #endregion

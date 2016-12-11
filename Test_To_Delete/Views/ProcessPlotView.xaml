@@ -20,7 +20,7 @@
     
     <Grid Background="Transparent">
 
-        <lvc:LineChart Series="{Binding DataSeries}" 
+            <lvc:LineChart Series="{Binding DataSeries}" 
                        Width="auto" 
                        Height="auto" 
                        Background="{DynamicResource MenuBackground}" 
@@ -29,19 +29,15 @@
                        VerticalAlignment="Stretch" 
                        FontSize="16"
                        DisableAnimations="True"
-                       Hoverable="False">
-            
-            <lvc:LineChart.AxisX>
-                <lvc:Axis Title="Time (minutes)" MaxValue="{Binding MaxValue}" MinValue="{Binding MinValue}" LabelFormatter="{Binding XFormatter}"/>
-            </lvc:LineChart.AxisX>
-            <lvc:LineChart.AxisY>
-                <lvc:Axis Title="Temperature (°C)" MaxValue="100" MinValue="0"/>
-            </lvc:LineChart.AxisY>
-        </lvc:LineChart>
-        
-        <!-- Debugging displays-->
-        
-        <Label Content="{Binding MaxValue}" Foreground="Transparent"/>
-        
+                       Hoverable="False"
+                       Margin="0,0,0,0">
+
+                <lvc:LineChart.AxisX>
+                    <lvc:Axis Title="Time (minutes)" MaxValue="{Binding MaxValue}" MinValue="{Binding MinValue}" LabelFormatter="{Binding XFormatter}"/>
+                </lvc:LineChart.AxisX>
+                <lvc:LineChart.AxisY>
+                    <lvc:Axis Title="Temperature (°C)" MaxValue="100" MinValue="0"/>
+                </lvc:LineChart.AxisY>
+            </lvc:LineChart>
     </Grid>
 </UserControl>
