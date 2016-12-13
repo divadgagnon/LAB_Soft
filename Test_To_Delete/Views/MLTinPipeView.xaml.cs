@@ -2,35 +2,62 @@
 using System.Windows.Controls;
 using GalaSoft.MvvmLight.Messaging;
 using System.Windows.Media;
+using System.ComponentModel;
+using System.Windows;
 
 namespace LAB.Views
 {
     /// <summary>
     /// Description for MLTinPipeView.
     /// </summary>
-    public partial class MLTinPipeView : UserControl
+    public partial class MLTinPipeView : UserControl, INotifyPropertyChanged
     {
-        private SolidColorBrush WaterColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF1976CD"));
-        private SolidColorBrush TransparentBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0000"));
+        private SolidColorBrush WaterColor;
+        private SolidColorBrush TransparentBrush;
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // Bindable properties
+        public bool IsFilled
+        {
+            get { return (bool)GetValue(IsFilledProperty); }
+            set { SetValue(IsFilledProperty, value); }
+        }
+
+        // Private control properties
+        public SolidColorBrush FillColor
+        {
+            get
+            {
+                if (IsFilled) { return WaterColor; }
+                else { return TransparentBrush; }
+            }
+        }
+
+        // Dependency Properties
+        public static readonly DependencyProperty IsFilledProperty = DependencyProperty.Register("IsFilled", typeof(bool), typeof(MLTinPipeView), new PropertyMetadata(false, IsFilledPropertyCallBack));
+
+        private static void IsFilledPropertyCallBack(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            MLTinPipeView _MLTinPipeView = o as MLTinPipeView;
+            if (_MLTinPipeView != null)
+            {
+                _MLTinPipeView.RaisePropertyChanged("IsFilled");
+                _MLTinPipeView.RaisePropertyChanged("FillColor");
+            }
+        }
 
         public MLTinPipeView()
         {
             InitializeComponent();
-            Messenger.Default.Register<Brewery.valve>(this, ValveUpdate_MessageReceived);
+
+            WaterColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF1976CD"));
+            TransparentBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0000"));
         }
 
-        private void ValveUpdate_MessageReceived(Brewery.valve Valve)
+        protected virtual void RaisePropertyChanged(string propertyName)
         {
-            if (Valve.Name != "MLTin") { return; }
-
-            if (Valve.IsOpen)
-            {
-                Water.Fill = WaterColor;
-            }
-            else
-            {
-                Water.Fill = TransparentBrush;
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
     }
 }

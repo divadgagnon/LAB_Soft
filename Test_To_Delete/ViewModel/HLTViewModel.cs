@@ -157,6 +157,7 @@ namespace LAB.ViewModel
             Messenger.Default.Register<Brewery>(this, "HLTVolumeSetPointReachedUpdate", HLTVolumeSetPointReachedUpdate_MessageReceived);
             Messenger.Default.Register<Brewery>(this, "HLTTempSetPointUpdate", HLTTempSetPointUpdate_MessageReceived);
             Messenger.Default.Register<Brewery>(this, "HLTTempSetPointReachedUpdate", HLTTempSetPointReachedUpdate_MessageReceived);
+            Messenger.Default.Register <bool>(this, "DesignMode", DesignMode_MessageReceived);
         }
 
         // UI Methods
@@ -227,6 +228,14 @@ namespace LAB.ViewModel
         {
             brewery.HLT.Temp.SetPointReached = _brewery.HLT.Temp.SetPointReached;
             RaisePropertyChanged(Thermo_SetPoint_VisibilityPropertyName);
+        }
+
+        private void DesignMode_MessageReceived(bool DesignMode)
+        {
+            Messenger.Default.Unregister<Brewery>(this, "MLTVolumeUpdate");
+            Messenger.Default.Unregister<Brewery>(this, "TemperatureUpdate");
+            Messenger.Default.Register<Brewery>(this, "DebugVolumeUpdate", VolumeUpdate_MessageReceived);
+            Messenger.Default.Register<Brewery>(this, "DebugTemperatureUpdate", TemperatureUpdate_MessageReceived);
         }
     }
 }

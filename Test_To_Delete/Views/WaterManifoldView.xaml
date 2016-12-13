@@ -4,7 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ignore="http://www.galasoft.ch/ignore"
-        mc:Ignorable="d ignore">
+        mc:Ignorable="d ignore"
+        x:Name="WaterManifold">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -20,7 +21,7 @@
         <Rectangle x:Name="VerticalStubIn" Fill="{StaticResource MenuBackground}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="75,0,0,25" Width="18" Height="50" Stroke="White" StrokeThickness="1"/>
         <Rectangle x:Name="BorderHider" Fill="{StaticResource MenuBackground}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15,0,0,26" Height="16" Width="5"/>
         <Rectangle x:Name="BorderHider2" Fill="{StaticResource MenuBackground}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="72,0,0,26" Height="16" Width="5"/>
-        <Rectangle x:Name="Water" Fill="#1000" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="1,0,0,1" Height="74" Width="16" Opacity="0.3"/>
+        <Rectangle x:Name="Water" Fill="{Binding ElementName=WaterManifold, Path=FillColor}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="1,0,0,1" Height="74" Width="16" Opacity="0.3"/>
         <Rectangle x:Name="Water2" Fill="{Binding ElementName=Water, Path=Fill}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="17,0,0,26" Height="16" Width="59" Opacity="0.3"/>
         <Rectangle x:Name="Water3" Fill="{Binding ElementName=Water, Path=Fill}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="76,0,0,26" Height="48" Width="16" Opacity="0.3"/>
     </Grid>

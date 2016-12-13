@@ -180,6 +180,13 @@ namespace LAB
                     break;
                 }
 
+                case 0x03:
+                {
+                        returnDigitalRead(packet);
+                        packet = null;
+                    break;
+                }
+
                 case 0x04:
                 {
                     returnDigitalWrite(packet);
@@ -253,6 +260,11 @@ namespace LAB
 
             // Send volSensor data to brewery command class
             Messenger.Default.Send<AnalogReturn>(volSensor, "VolumeUpdate");            
+        }
+
+        // Digital Read return
+        private void returnDigitalRead(byte[] packet)
+        {
         }
 
         // Digital Write return

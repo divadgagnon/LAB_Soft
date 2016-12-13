@@ -35,8 +35,8 @@ namespace LAB.Debug_Tools
 
         private void UpdateTimer_Tick(object sender, System.EventArgs e)
         {
-            Messenger.Default.Send<Brewery>(brewery, "TemperatureUpdate");
-            Messenger.Default.Send<Brewery>(brewery, "VolumeUpdate");
+            Messenger.Default.Send<Brewery>(brewery, "DebugTemperatureUpdate");
+            Messenger.Default.Send<Brewery>(brewery, "DebugVolumeUpdate");
         }
     }
 }

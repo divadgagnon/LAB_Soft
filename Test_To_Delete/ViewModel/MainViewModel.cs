@@ -1206,9 +1206,6 @@ namespace LAB.ViewModel
             process.Session.IsStarted = true;
             process.Session.StartRequested = false;
             RaisePropertyChanged(StartSessionButtonContentPropertyName);
-
-            // Check if Design Session and skip the sensor update timers if true
-            if (DesignMode) { goto SkipDAQTimers; }
             
             // Setting Temperature Timer Properties
             UpdateTempSensorTimer.Interval = TimeSpan.FromMilliseconds(hardwareSettings.TempRefreshRate);
@@ -1219,8 +1216,6 @@ namespace LAB.ViewModel
             UpdateVolSensorTimer.Interval = TimeSpan.FromMilliseconds(hardwareSettings.VolResfreshRate);
             UpdateVolSensorTimer.Tick += UpdateVolSensorTimer_Tick;
             UpdateVolSensorTimer.Start();
-
-        SkipDAQTimers:
 
             // Verify the automation mode selected
             if((brewery.AutomationMode == automationMode.Manual) || (brewery.AutomationMode == automationMode.SemiAuto))
@@ -1346,6 +1341,7 @@ namespace LAB.ViewModel
         // Temperature Update
         private void TemperatureUpdate_MessageReceived(Brewery _brewery)
         {
+            if(DesignMode) { RunAutoStateMachine(); return; }
             brewery.HLT.Temp.Value = _brewery.HLT.Temp.Value;
             brewery.MLT.Temp.Value = _brewery.MLT.Temp.Value;
             brewery.BK.Temp.Value = _brewery.BK.Temp.Value;
@@ -1356,6 +1352,7 @@ namespace LAB.ViewModel
         // Volume Update
         private void VolumeUpdate_MessageReceived(Brewery _brewery)
         {
+            if(DesignMode) { RunAutoStateMachine();  return; }
             if (_brewery.HLT.Volume.Value != 500) { brewery.HLT.Volume.Value = _brewery.HLT.Volume.Value; }
             if (_brewery.BK.Volume.Value != 500) { brewery.BK.Volume.Value = _brewery.BK.Volume.Value; }
             if (brewery.AutomationMode != automationMode.Automatic) { return; }
@@ -1491,6 +1488,21 @@ namespace LAB.ViewModel
             RaisePropertyChanged("ValveList");
         }
 
+        // DEBUG METHODS
+
+        private void DebugTemperatureUpdate_MessageReceived(Brewery _brewery)
+        {
+            brewery.HLT.Temp.Value = _brewery.HLT.Temp.Value;
+            brewery.MLT.Temp.Value = _brewery.MLT.Temp.Value;
+            brewery.BK.Temp.Value = _brewery.BK.Temp.Value;
+        }
+
+        private void DebugVolumeUpdate_MessageReveived(Brewery _brewery)
+        {
+            brewery.HLT.Volume.Value = _brewery.HLT.Volume.Value; 
+            brewery.BK.Volume.Value = _brewery.BK.Volume.Value; 
+        }
+
         #endregion
 
         #region Debug
@@ -1504,6 +1516,8 @@ namespace LAB.ViewModel
         private void StartDebugSession()
         {
             DesignMode = true;
+            Messenger.Default.Register<Brewery>(this, "DebugTemperatureUpdate", DebugTemperatureUpdate_MessageReceived);
+            Messenger.Default.Register<Brewery>(this, "DebugVolumeUpdate", DebugVolumeUpdate_MessageReveived);
             Messenger.Default.Send<bool>(DesignMode, "DesignMode");
             startBrewSessionClickCommand();
         }

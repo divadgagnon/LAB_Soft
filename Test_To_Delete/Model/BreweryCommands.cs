@@ -39,7 +39,6 @@ namespace LAB.Model
             Messenger.Default.Register<HardwareSettings>(this, "HardwareSettingsUpdate", UpdateHardwareSettings);
             Messenger.Default.Register<Probes>(this, "TemperatureUpdate", TemperatureUpdate_MessageReceived);
             Messenger.Default.Register <bool>(this, "DesignMode", DesignMode_MessageReceived);
-            Messenger.Default.Register<Brewery>(this, "CalibrationMode", CalibrationMode_MessageReceived);
 
             // Initializing Timers
             DisconnectTimer = new DispatcherTimer();
@@ -372,8 +371,8 @@ namespace LAB.Model
         {
             if (_designMode)
             {
-                Messenger.Default.Register<Brewery>(this, "TemperatureUpdate", DesignModeTempUpdate_MessageReceived);
-                Messenger.Default.Register<Brewery>(this, "VolumeUpdate", DesignModeVolumeUpdate_MessageReceived);
+                Messenger.Default.Register<Brewery>(this, "DebugTemperatureUpdate", DesignModeTempUpdate_MessageReceived);
+                Messenger.Default.Register<Brewery>(this, "DebugVolumeUpdate", DesignModeVolumeUpdate_MessageReceived);
             }
         }
 
@@ -388,11 +387,6 @@ namespace LAB.Model
         {
             if (_brewery.HLT.Volume.Value != 500) { brewery.HLT.Volume.Value = _brewery.HLT.Volume.Value; }
             if (_brewery.BK.Volume.Value != 500) { brewery.BK.Volume.Value = _brewery.BK.Volume.Value; }
-        }
-
-        private void CalibrationMode_MessageReceived(Brewery _brewery)
-        {
-            brewery.CalibrationModeOn = _brewery.CalibrationModeOn;
         }
 
     }

@@ -1,10 +1,7 @@
 ﻿using System.Windows.Media;
 using System.Windows.Controls;
-using GalaSoft.MvvmLight.Messaging;
 using System.Windows;
 using System.ComponentModel;
-using GalaSoft.MvvmLight;
-using LAB.Model;
 
 namespace LAB.Views
 {
