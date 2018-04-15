@@ -87,7 +87,7 @@ namespace LAB.Model
 
         public class settings
         {
-            public double TempHoldingRange { get; set; } = 0.2;
+            public double TempHoldingRange { get; set; } = 0.5;
         }
     }
 
@@ -156,64 +156,40 @@ namespace LAB.Model
         public bool Value { get; set; }
     }
 
+
+    // Probe Class containing all the probes (Addresses and string identifiers (Color) hardcoded for now
     public class Probes
     {
-        public yellow Yellow { get; set; }
-        public pink Pink { get; set; }
-        public orange Orange { get; set; }
-        public yellowOrange YellowOrange { get; set; }
-        public yellowPink YellowPink { get; set; }
+        public probe Yellow { get; set; }
+        public probe Pink { get; set; }
+        public probe Orange { get; set; }
+        public probe YellowOrange { get; set; }
+        public probe YellowPink { get; set; }
 
         // Constructor
         public Probes()
         {
-            Yellow = new yellow();
-            Pink = new pink();
-            Orange = new orange();
-            YellowOrange = new yellowOrange();
-            YellowPink = new yellowPink();
+            Yellow = new probe(0x26, "Yellow");
+            Pink = new probe(0x4F, "Pink");
+            Orange = new probe(0xA5, "Orange");
+            YellowOrange = new probe(0x9E, "Yellow and Orange");
+            YellowPink = new probe(0x4B, "Yellow and Pink");
         }
+    }
 
-        // Temperature probes
 
-        public class yellow
+    // Single probe class
+    public class probe
+    {
+        public byte Address { get; }
+        public double Temp { get; set; }
+        public bool IsConnected { get; set; }
+        public string Color { get; }
+
+        public probe(byte address, string color)
         {
-            public byte Address { get; } = 0x26;
-            public double Temp { get; set; }
-            public bool IsConnected { get; set; }
-            public string Color { get; } = "Yellow";
-        }
-
-        public class pink
-        {
-            public byte Address { get; } = 0x4F;
-            public double Temp { get; set; }
-            public bool IsConnected { get; set; }
-            public string Color { get; } = "Pink";
-        }
-
-        public class orange
-        {
-            public byte Address { get; } = 0xA5;
-            public double Temp { get; set; }
-            public bool IsConnected { get; set; }
-            public string Color { get; } = "Orange";
-        }
-
-        public class yellowOrange
-        {
-            public byte Address { get; } = 0x9E;
-            public double Temp { get; set; }
-            public bool IsConnected { get; set; }
-            public string Color { get; } = "Yellow and Orange";
-        }
-
-        public class yellowPink
-        {
-            public byte Address { get; } = 0x4B;
-            public double Temp { get; set; }
-            public bool IsConnected { get; set; }
-            public string Color { get; } = "Yellow and Pink";
+            Address = address;
+            Color = color;
         }
 
     }
@@ -229,8 +205,9 @@ namespace LAB.Model
     public class HardwareSettings
     {
         public string comPort { get; set; }
-        public int VolResfreshRate { get; set; } = 1000;
+        public int VolResfreshRate { get; set; } = 1500;
         public int TempRefreshRate { get; set; } = 2500;
+        public int SensorsRefreshRate { get; set; } = 1500;
         public int OneWireBus { get; set; } = 2;
         public int HLT_Vol_Pin { get; set; } = 0;
         public int BK_Vol_Pin { get; set; } = 1;
@@ -242,6 +219,11 @@ namespace LAB.Model
         public int AirPump1_Pin { get; set; } = 8;
         public int AirPump2_Pin { get; set; } = 9;
         public int PrimingDelay { get; set; } = 5000;
+        public double Kp { get; set; } = 0.3;
+        public double Ki { get; set; } = 0.0002;
+        public double Kd { get; set; } = 20;
+        public int ErrorDerivativeCount { get; set; } = 120;
+        public double PIDTimerInterval { get; set; } = 5;
         public SpecificProbes HLT_Temp_Probe { get; set; } = new SpecificProbes();
         public SpecificProbes MLT_Temp_Probe { get; set; } = new SpecificProbes();
         public SpecificProbes BK_Temp_Probe { get; set; } = new SpecificProbes();
@@ -250,7 +232,7 @@ namespace LAB.Model
     public class Brewery
     {
         public bool IsConnected { get; set; }
-        public bool CalibrationModeOn { get; set; }
+        public bool CalibrationModeOn { get; set; } = false; // DEBUG
 
         public vessel HLT { get; set; }
         public vessel MLT { get; set; }
@@ -263,6 +245,7 @@ namespace LAB.Model
         public ObservableCollection<valve> Valves { get; set; }
         public valveConfig ValveConfig { get; set; }
         public calibration Calibration { get; set; }
+        public bool SafeModeOn { get; set; }
 
         public Brewery()
         {
@@ -319,14 +302,23 @@ namespace LAB.Model
         {
             public double Value { get; set; }
             public double SetPoint { get; set; }
+            public double LastError { get; set; }
+            public double ErrorIntegral { get; set; }
+            public List<double> ErrorDerivative { get; set; }
             public bool SetPointReached { get; set; } = true;
             public bool BoilReached { get; set; }
+
+            public temp()
+            {
+                ErrorDerivative = new List<double>();
+            }
         }
 
         public class burner
         {
             public bool IsOn { get; set; }
             public bool PilotIsOn { get; set; }
+            public double DutyCycle { get; set; }
         }
 
         public class pump
@@ -608,6 +600,7 @@ namespace LAB.Model
         Chill,
         Fermenter_Transfer,
         Manual_Override,
+        SemiAuto,
         CalibrationMode,
     }
 

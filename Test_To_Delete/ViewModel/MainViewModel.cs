@@ -46,8 +46,10 @@ namespace LAB.ViewModel
         // Define Timers
         DispatcherTimer UpdateTempSensorTimer;
         DispatcherTimer UpdateVolSensorTimer;
+        DispatcherTimer UpdateSensorsTimer;
         DispatcherTimer AlarmTimer;
-        DispatcherTimer PrimingTimer;
+        DispatcherTimer PrimingTimer1;
+        DispatcherTimer PrimingTimer2;
         DispatcherTimer MashStepTimer;
         DispatcherTimer BoilTimer;
         DispatcherTimer HopScheduleTimer;
@@ -73,6 +75,7 @@ namespace LAB.ViewModel
         double MLTStartVolume;
         int step;
         int CurrentHopAddition;
+        int PrimingCount;
         TimeSpan RemainingTime;
         TimeSpan BoilRemainingTime;
         TimeSpan StepStartTime;
@@ -182,11 +185,8 @@ namespace LAB.ViewModel
         {
             get
             {
-                if(process.Session.IsStarted)
-                {
-                    return "Stop Session";
-                }
-
+                if(brewery.SafeModeOn) { return "Resume Session"; }
+                if(process.Session.IsStarted) { return "Stop Session"; }
                 return "Start Session";
             }
         }
@@ -224,7 +224,7 @@ namespace LAB.ViewModel
         {
             get
             {
-                if (brewery.AirPump1.IsOn) { return OnColor; }
+                if (brewery.AirPump2.IsOn) { return OnColor; }
                 else { return OffColor; }
             }
         }
@@ -312,6 +312,8 @@ namespace LAB.ViewModel
             }
         }
 
+        public List<bool> PlotVisibility { get; set; } = new List<bool>(new bool[3] { true, false, false });
+
         #endregion
 
         #region Constructor
@@ -344,12 +346,17 @@ namespace LAB.ViewModel
             ValveClickCommand = new RelayCommand<Brewery.valve>(valveClickCommand);
             AirPump1ClickCommand = new RelayCommand(airPump1ClickCommand);
             AirPump2ClickCommand = new RelayCommand(airPump2ClickCommand);
+            HLTPlotButtonClickCommand = new RelayCommand(hltPlotButtonClickCommand);
+            MLTPlotButtonClickCommand = new RelayCommand(mltPlotButtonClickCommand);
+            BKPLotButtonClickCommand = new RelayCommand(bkPlotButtonClickCommand);
 
             // Initializing Timers
             UpdateTempSensorTimer = new DispatcherTimer();
             UpdateVolSensorTimer = new DispatcherTimer();
+            UpdateSensorsTimer = new DispatcherTimer();
             AlarmTimer = new DispatcherTimer();
-            PrimingTimer = new DispatcherTimer();
+            PrimingTimer1 = new DispatcherTimer();
+            PrimingTimer2 = new DispatcherTimer();
             MashStepTimer = new DispatcherTimer();
             BoilTimer = new DispatcherTimer();
             HopScheduleTimer = new DispatcherTimer();
@@ -395,10 +402,14 @@ namespace LAB.ViewModel
             Messenger.Default.Register<Brewery>(this, "HLTTempSetPointReachedUpdate", HLTTempSetPointReachedUpdate_MessageReceived);
             Messenger.Default.Register<Brewery>(this, "MLTTempSetPointReachedUpdate", MLTTempSetPointReachedUpdate_MessageReceived);
             Messenger.Default.Register<Brewery>(this, "BKTempSetPointReachedUpdate", BKTempSetPointReachedUpdate_MessageReceived);
+            Messenger.Default.Register<Brewery>(this, "HLTPIDUpdate", HLTPIDUpdate_MessageReceived);
+            Messenger.Default.Register<Brewery>(this, "MLTPIDUpdate", MLTPIDUpdate_MessageReceived);
+            Messenger.Default.Register<Brewery>(this, "BKPIDUpdate", BKPIDUpdate_MessageReceived);
             Messenger.Default.Register<Brewery.vessel>(this, "BurnerOverride", BurnerOverride_MessageReceived);
             Messenger.Default.Register<Brewery.pump>(this, "PumpOverride", PumpOverride_MessageReceived);
             Messenger.Default.Register<Brewery.valve>(this, ValveUpdate_MessageReceived);
             Messenger.Default.Register<Ingredients>(this, (Ingredients _ingredients) => { ingredients = _ingredients; });
+            Messenger.Default.Register<bool>(this, "SafeModeUpdate", SafeModeUpdate_MessageReceived);
 
             // Get and set the saved hardware settings on startup
             Messenger.Default.Send<NotificationMessage>(new NotificationMessage(this,""), "SetDefaultHardwareSettings");
@@ -410,6 +421,9 @@ namespace LAB.ViewModel
 
         private void RunAutoStateMachine()
         {
+
+            if (brewery.SafeModeOn) { return; }
+
             switch(breweryState)
             {
                 #region StandBy
@@ -451,8 +465,18 @@ namespace LAB.ViewModel
                             breweryCommand.ActivateAirPump1(RelayState.On);
                         }
 
+                        // Send Message to light the pilots
+                        if (!userAlarm.MessageSent) { PlayAlarm("Pilot", true, true, true); }
+
+                        // Check for user confirmation of pilots
+                        if (userAlarm.ProceedIsPressed && brewery.HLT.Volume.Value > 10)
+                        {
+                            // Get to HLT Set point and Hold
+                            breweryCommand.HoldTempPID(brewery.HLT, process.Strike.Temp);
+                        }
+
                         // Check if HLT volume reached SetPoint
-                        if(brewery.HLT.Volume.Value >= brewery.HLT.Volume.SetPoint)
+                        if (brewery.HLT.Volume.Value >= brewery.HLT.Volume.SetPoint && userAlarm.ProceedIsPressed)
                         {
                             // Set the SetPointReached property and send the data to the HLT view
                             brewery.HLT.Volume.SetPointReached = true;
@@ -470,25 +494,20 @@ namespace LAB.ViewModel
                 #region Strike Heat
                 case BreweryState.Strike_Heat:
                     {
-                        // Send Message to light the pilots
-                        if (!userAlarm.MessageSent) { PlayAlarm("Pilot", true, true, true); }
+                        // Get to HLT Set point and Hold
+                        breweryCommand.HoldTempPID(brewery.HLT, process.Strike.Temp);
 
-                        // Check for user confirmation of pilots
-                        if(userAlarm.ProceedIsPressed)
+                        //Check if temperature range is reached
+                        if (brewery.HLT.Temp.SetPointReached || brewery.HLT.Temp.Value > process.Strike.Temp)
                         {
-                            // Get to HLT Set point and Hold
-                            breweryCommand.HoldTemp(Vessels.HLT, process.Strike.Temp);
-                        }
+                            // Set HLT Start Volume for MLT Volume calculation
+                            HLTStartVolume = brewery.HLT.Volume.Value;
 
-                        // Check if temperature range is reached
-                        if (brewery.HLT.Temp.SetPointReached)
-                        {
                             // Change State
                             breweryState = BreweryState.Strike_Transfer;
                             brewery.MLT.Volume.SetPointReached = false;
                             RaisePropertyChanged(BreweryStateDisplayPropertyName);
                             userAlarm = new UserAlarm();
-
                         }
                         break;
                     }
@@ -497,6 +516,9 @@ namespace LAB.ViewModel
                 #region Strike Transfer
                 case BreweryState.Strike_Transfer:
                     {
+                        // Hold Strike Temp
+                        breweryCommand.HoldTempPID(brewery.HLT, process.Strike.Temp);
+
                         // Define SetPoint for initial MLT volume (dough in)
                         brewery.MLT.Volume.SetPoint = process.MashSteps[0].Volume;
                         Messenger.Default.Send<Brewery>(brewery, "MLTVolumeSetPointUpdate");
@@ -509,9 +531,6 @@ namespace LAB.ViewModel
                             brewery.ValveConfig.ConfigSet = ValveConfigs.Strike_Transfer;
                         }
 
-                        // Hold Strike Temp
-                        breweryCommand.HoldTemp(Vessels.HLT, process.Strike.Temp);
-
                         // If the user did not set the correct valve configuration, hold temperature and wait
                         if (!brewery.ValveConfig.Check(ValveConfigs.Strike_Transfer, brewery.Valves))
                         {
@@ -520,20 +539,26 @@ namespace LAB.ViewModel
 
                         if (brewery.MLT.Volume.Value < brewery.MLT.Volume.SetPoint)
                         {
-                            // Let a delay for pump priming if the pump is off and not primed
+                            // Execute pump priming sequence if the pump is off and not primed
                             if (!brewery.Pump1.IsPrimed && !brewery.Pump1.IsOn && !brewery.Pump1.IsPriming)
                             {
-                                StartPrimingDelay(1);
-                                PlayAlarm("Priming", false, false, false);
+                                PrimingTimer1.Interval = TimeSpan.FromSeconds(1.5);
+                                PrimingTimer1.Tick += PrimingTimer1_Tick;
+                                PrimingTimer1.Start();
+
+                                breweryCommand.ActivatePump1(RelayState.On);
+
+                                brewery.Pump1.IsPriming = true;
+                                Messenger.Default.Send<Brewery.pump>(brewery.Pump1, "PrimingUpdate");
                             }
 
                             // Else if pump is primed but off
                             else if (brewery.Pump1.IsPrimed && !brewery.Pump1.IsOn)
                             {
-                                HLTStartVolume = brewery.HLT.Volume.Value;
                                 breweryCommand.ActivatePump1(RelayState.On);
                                 PlayAlarm("Transfering", false, false, false);
                             }
+
                             // Update the transfered volume
                             else if(brewery.Pump1.IsOn)
                             {
@@ -573,10 +598,10 @@ namespace LAB.ViewModel
                         }
 
                         // Hold MLT temp at set point (dough in temp)
-                        breweryCommand.HoldTemp(Vessels.MLT, process.Strike.Temp);
+                        breweryCommand.HoldTempPID(brewery.MLT, process.Strike.Temp);
 
                         // Hold HLT temp at set point 
-                        breweryCommand.HoldTemp(Vessels.HLT, process.Sparge.Temp);
+                        breweryCommand.HoldTempPID(brewery.HLT, process.Sparge.Temp);
 
                         // Check if the valves are in the requested position
                         if (!(brewery.ValveConfig.Check(ValveConfigs.Mash_Recirc, brewery.Valves))) { return; }
@@ -584,22 +609,41 @@ namespace LAB.ViewModel
                         // Check if the temperature is within range and set the SetPointReached property
                         if (brewery.MLT.Temp.SetPointReached)
                         {
+                            // Stop recirculating if needed
+                            if(brewery.Pump2.IsOn) { breweryCommand.ActivatePump2(RelayState.Off); }
+                            
                             // Ask user to dough in and confirm BEFORE putting the grains play alarm sound to request user action
                             if (!userAlarm.MessageSent)
                             {
                                 PlayAlarm("DoughIn", true, true, true);
                             }
-
-                            // If user confirmed go to Mash step #1
-                            if(userAlarm.ProceedIsPressed)
+                        }
+                        else if (brewery.MLT.Temp.Value > brewery.MLT.Temp.SetPoint)
+                        {
+                            // Start recirculating
+                            if (!brewery.Pump2.IsPrimed && !brewery.Pump2.IsOn && !brewery.Pump2.IsPriming)
                             {
-                                // Start the mash process
-                                breweryCommand.LightBurner(Vessels.MLT, RelayState.Off);
-                                breweryState = BreweryState.Mash;
-                                RaisePropertyChanged(BreweryStateDisplayPropertyName);
-                                userAlarm = new UserAlarm();
+                                PrimingTimer2.Interval = TimeSpan.FromSeconds(1.5);
+                                PrimingTimer2.Tick += PrimingTimer2_Tick;
+                                PrimingTimer2.Start();
+
+                                breweryCommand.ActivatePump2(RelayState.On);
+
+                                brewery.Pump2.IsPriming = true;
+                                Messenger.Default.Send<Brewery.pump>(brewery.Pump2, "PrimingUpdate");
                             }
                         }
+
+                        // If user confirmed go to Mash step #1
+                        if (userAlarm.ProceedIsPressed)
+                        {
+                            // Start the mash process
+                            breweryCommand.LightBurner(Vessels.MLT, RelayState.Off);
+                            breweryState = BreweryState.Mash;
+                            RaisePropertyChanged(BreweryStateDisplayPropertyName);
+                            userAlarm = new UserAlarm();
+                        }
+
                         break;
                     }
                 #endregion
@@ -630,6 +674,7 @@ namespace LAB.ViewModel
                             // Check if all steps are completed
                             if (process.MashSteps.Count < step+1)
                             {
+                                breweryCommand.ActivatePump2(RelayState.Off);
                                 breweryState = BreweryState.Sparge;
                                 RaisePropertyChanged(BreweryStateDisplayPropertyName);
                                 userAlarm = new UserAlarm();
@@ -647,20 +692,22 @@ namespace LAB.ViewModel
                         }
 
                         // Hold HLT temp set point at mash step temp
-                        breweryCommand.HoldTemp(Vessels.MLT, process.MashSteps[step].Temp);
+                        breweryCommand.HoldTempPID(brewery.MLT, process.MashSteps[step].Temp);
 
                         // Hold HLT temp at sparge temp
-                        breweryCommand.HoldTemp(Vessels.HLT, process.Sparge.Temp);
+                        breweryCommand.HoldTempPID(brewery.HLT, process.Sparge.Temp);
 
                         // Start recirculating
-                        if(!brewery.Pump2.IsPrimed && !brewery.Pump2.IsPriming)
+                        if (!brewery.Pump2.IsPrimed && !brewery.Pump2.IsOn && !brewery.Pump2.IsPriming)
                         {
-                            StartPrimingDelay(2);
-                        }
-                        else if(brewery.Pump2.IsPrimed && !brewery.Pump2.IsOn)
-                        {
+                            PrimingTimer2.Interval = TimeSpan.FromSeconds(1.5);
+                            PrimingTimer2.Tick += PrimingTimer2_Tick;
+                            PrimingTimer2.Start();
+
                             breweryCommand.ActivatePump2(RelayState.On);
-                            breweryCommand.ActivateAirPump2(RelayState.On);
+
+                            brewery.Pump2.IsPriming = true;
+                            Messenger.Default.Send<Brewery.pump>(brewery.Pump2, "PrimingUpdate");
                         }
 
                         break;
@@ -670,23 +717,39 @@ namespace LAB.ViewModel
                 #region Sparge
                 case BreweryState.Sparge:
                     {
+
+                        // Activate AirPump 2 if not activated
+
+                        if (!brewery.AirPump2.IsOn)
+                        {
+                            breweryCommand.ActivateAirPump2(RelayState.On);
+                        }
+
                         // Send Sparging Message
                         if (brewery.ValveConfig.ConfigSet != ValveConfigs.Fly_Sparge)
                         {
                             brewery.ValveConfig.Set(ValveConfigs.Fly_Sparge, brewery.Valves);
                             brewery.ValveConfig.ConfigSet = ValveConfigs.Fly_Sparge;
-                            breweryCommand.ActivatePump2(RelayState.Off);
+                            breweryCommand.ActivatePump2(RelayState.On);
                             userAlarm = new UserAlarm();
                         }
 
                         // Hold HLT at Sparge Temp
-                        breweryCommand.HoldTemp(Vessels.HLT, process.Sparge.Temp);
+                        if (brewery.HLT.Volume.Value > 10)
+                        {
+                            breweryCommand.HoldTempPID(brewery.HLT, process.Sparge.Temp);
+                        }
+                        if (brewery.HLT.Volume.Value <= 10 && brewery.HLT.Burner.IsOn)
+                        {
+                            // Turn off HLT temp monitoring
+                            breweryCommand.HoldTempPID(brewery.HLT, 0);
+                        }
 
                         // Check if valve config is confirmed
                         if (!brewery.ValveConfig.Check(ValveConfigs.Fly_Sparge, brewery.Valves)) { return; }
 
                         // If HLT temp is in range then start the pumps
-                        if(brewery.HLT.Temp.SetPointReached && (!brewery.Pump1.IsOn || !brewery.Pump2.IsOn) && FirstSparge)
+                        if(brewery.HLT.Temp.SetPointReached && FirstSparge)
                         {
                             // Save the HLT Start Volume and start the pumps
                             HLTStartVolume = brewery.HLT.Volume.Value;
@@ -695,7 +758,7 @@ namespace LAB.ViewModel
                             FirstSparge = false;
 
                             // Turn off MLT Temp monitoring
-                            breweryCommand.HoldTemp(Vessels.MLT, 0);
+                            breweryCommand.HoldTempPID(brewery.MLT, 0);
 
                             // Set The HLT Volume Set Point and save the MLT Start Volume
                             MLTStartVolume = brewery.MLT.Volume.Value;
@@ -726,11 +789,11 @@ namespace LAB.ViewModel
                                 breweryCommand.ActivatePump1(RelayState.Off);
                             }
 
-                            if(brewery.HLT.Volume.Value <= 10 && brewery.HLT.Burner.IsOn)
+                            if (brewery.HLT.Volume.Value <= 10)
                             {
-                                breweryCommand.LightBurner(Vessels.HLT, RelayState.Off);
-                                brewery.HLT.Temp.SetPointReached = false;
-                                Messenger.Default.Send<Brewery>(brewery, "HLTTempSetPointReachedUpdate");
+                                breweryCommand.HoldTemp(Vessels.HLT, 0);
+                                //brewery.HLT.Temp.SetPointReached = true;
+                                //Messenger.Default.Send<Brewery>(brewery, "HLTTempSetPointReachedUpdate");
                             }
 
                             brewery.HLT.Volume.SetPointReached = true;
@@ -762,17 +825,13 @@ namespace LAB.ViewModel
                         // Monitor BK Volume if over 10 start heating
                         if(brewery.BK.Volume.Value>= 10 && !brewery.BK.Burner.IsOn)
                         {
-                            breweryCommand.HoldTemp(Vessels.BK, 100);
+                            breweryCommand.HoldTempPID(brewery.BK, 100);
                         }
 
                         // Monitor Bk Volume for process target
                         if(brewery.BK.Volume.Value >= process.Boil.Volume)
                         {
-                            if (brewery.Pump2.IsOn)
-                            {
-                                breweryCommand.ActivatePump2(RelayState.Off);
-                            }
-
+                            breweryCommand.ActivatePump2(RelayState.Off);
                             brewery.BK.Volume.SetPointReached = true;
 
                             // Switch to boil state
@@ -790,7 +849,7 @@ namespace LAB.ViewModel
                 case BreweryState.Boil:
                     {
                         // Hold boil temp in BK
-                        breweryCommand.HoldTemp(Vessels.BK, 100);
+                        breweryCommand.HoldTempPID(brewery.BK, 100);
 
                         // Monitor BK and send an alarm to warn boil over
                         if (brewery.BK.Temp.Value>=97 && !BoilOverSent)
@@ -859,7 +918,7 @@ namespace LAB.ViewModel
                         if (BoilComplete)
                         {
                             // Turn off BK burner
-                            breweryCommand.HoldTemp(Vessels.BK, 0);
+                            breweryCommand.HoldTempPID(brewery.BK, 0);
 
                             // Switch to Chill State
                             breweryState = BreweryState.Chill;
@@ -1049,27 +1108,6 @@ namespace LAB.ViewModel
             AlarmTimer.Stop();
         }
 
-        private void StartPrimingDelay(int PumpNum)
-        {
-            if (PumpNum == 1)
-            {
-                brewery.Pump1.IsPriming = true;
-                Messenger.Default.Send<Brewery.pump>(brewery.Pump1, "PrimingUpdate");
-                PrimingTimer.Tick += PrimingTimer1_Tick;
-                PrimingTimer.Interval = TimeSpan.FromMilliseconds(hardwareSettings.PrimingDelay);
-                PrimingTimer.Start();
-            }
-            else if(PumpNum == 2)
-            {
-                brewery.Pump2.IsPriming = true;
-                Messenger.Default.Send<Brewery.pump>(brewery.Pump2, "PrimingUpdate");
-                PrimingTimer.Tick += PrimingTimer2_Tick;
-                PrimingTimer.Interval = TimeSpan.FromMilliseconds(hardwareSettings.PrimingDelay);
-                PrimingTimer.Start();
-            }
-            else { throw new Exception("Pump number is out of range, only two pumps in the system (1 and 2)"); }
-        }
-
         #endregion
 
         #region Timer Tick Events
@@ -1084,6 +1122,11 @@ namespace LAB.ViewModel
             breweryCommand.UpdateVolSensors();
         }
 
+        private void UpdateSensorsTimer_Tick(object sender, EventArgs e)
+        {
+            breweryCommand.UpdateSensors();
+        }
+
         int i = 0;
         private void AlarmTimer_Tick(object sender, EventArgs e)
         {
@@ -1095,17 +1138,41 @@ namespace LAB.ViewModel
 
         private void PrimingTimer1_Tick(object sender, EventArgs e)
         {
-            PrimingTimer.Stop();
-            brewery.Pump1.IsPrimed = true;
-            brewery.Pump1.IsPriming = false;
+            if (PrimingCount >= 4)
+            {
+                PrimingCount = 0;
+                PrimingTimer1.Stop();
+                brewery.Pump1.IsPriming = false;
+                brewery.Pump1.IsPrimed = true;
+                Messenger.Default.Send<Brewery.pump>(brewery.Pump1, "PrimingUpdate");
+                return;
+            }
+
+            if(PrimingCount == 0) { brewery.Pump1.IsPriming = true; }
+            if (brewery.Pump1.IsOn) { breweryCommand.ActivatePump1(RelayState.Off); }
+            else { breweryCommand.ActivatePump1(RelayState.On); }
+            PrimingCount++;
+            
             Messenger.Default.Send<Brewery.pump>(brewery.Pump1);
         }
 
         private void PrimingTimer2_Tick(object sender, EventArgs e)
         {
-            PrimingTimer.Stop();
-            brewery.Pump2.IsPrimed = true;
-            brewery.Pump2.IsPriming = false;
+            if (PrimingCount >= 4)
+            {
+                PrimingCount = 0;
+                PrimingTimer2.Stop();
+                brewery.Pump2.IsPriming = false;
+                brewery.Pump2.IsPrimed = true;
+                Messenger.Default.Send<Brewery.pump>(brewery.Pump2, "PrimingUpdate");
+                return;
+            }
+
+            if (PrimingCount == 0) { brewery.Pump2.IsPriming = true; }
+            if (brewery.Pump2.IsOn) { breweryCommand.ActivatePump2(RelayState.Off); }
+            else { breweryCommand.ActivatePump2(RelayState.On); }
+            PrimingCount++;
+
             Messenger.Default.Send<Brewery.pump>(brewery.Pump2);
         }
 
@@ -1179,8 +1246,8 @@ namespace LAB.ViewModel
                 return;
             }
 
-            // Verify Session Status if started, stop session
-            if (process.Session.IsStarted)
+            // Verify Session Status if started and safemode is off then stop session
+            if (process.Session.IsStarted && !brewery.SafeModeOn)
             {
                 // Stop data acquisition
                 process.Session.StartRequested = false;
@@ -1192,6 +1259,13 @@ namespace LAB.ViewModel
                 // Reset all relays to off state
                 breweryCommand.PreDisconnect();
                 return;
+            }
+
+            // Check if Current Session is in safe mode. If true, Resume
+            if(brewery.SafeModeOn)
+            {
+                brewery.SafeModeOn = false;
+                RaisePropertyChanged(StartSessionButtonContentPropertyName);
             }
 
             // Get recipe file if not chosen already
@@ -1206,21 +1280,22 @@ namespace LAB.ViewModel
             process.Session.IsStarted = true;
             process.Session.StartRequested = false;
             RaisePropertyChanged(StartSessionButtonContentPropertyName);
-            
-            // Setting Temperature Timer Properties
-            UpdateTempSensorTimer.Interval = TimeSpan.FromMilliseconds(hardwareSettings.TempRefreshRate);
-            UpdateTempSensorTimer.Tick += UpdateTempSensorTimer_Tick;
-            UpdateTempSensorTimer.Start();
 
-            // Setting Volume Timer Properties
-            UpdateVolSensorTimer.Interval = TimeSpan.FromMilliseconds(hardwareSettings.VolResfreshRate);
-            UpdateVolSensorTimer.Tick += UpdateVolSensorTimer_Tick;
-            UpdateVolSensorTimer.Start();
+            // Setting Sensors Timer Properties
+            UpdateSensorsTimer.Interval = TimeSpan.FromMilliseconds(hardwareSettings.SensorsRefreshRate);
+            UpdateSensorsTimer.Tick += UpdateSensorsTimer_Tick;
+            UpdateSensorsTimer.Start();
 
             // Verify the automation mode selected
-            if((brewery.AutomationMode == automationMode.Manual) || (brewery.AutomationMode == automationMode.SemiAuto))
+            if((brewery.AutomationMode == automationMode.Manual))
             {
                 breweryState = BreweryState.Manual_Override;
+                RaisePropertyChanged(BreweryStateDisplayPropertyName);
+                return;
+            }
+            else if (brewery.AutomationMode == automationMode.SemiAuto)
+            {
+                breweryState = BreweryState.SemiAuto;
                 RaisePropertyChanged(BreweryStateDisplayPropertyName);
                 return;
             }
@@ -1297,6 +1372,41 @@ namespace LAB.ViewModel
             RaisePropertyChanged("ValveList");
         }
 
+        // Plot Buttons
+        private void hltPlotButtonClickCommand()
+        {
+            List<Visibility> _PlotVisibility = new List<Visibility>(new Visibility[] { Visibility.Visible, Visibility.Hidden, Visibility.Hidden});
+            Messenger.Default.Send<List<Visibility>>(_PlotVisibility, "PlotVisiblityUpdate");
+            _PlotVisibility.Clear();
+            _PlotVisibility = null;
+
+            PlotVisibility = new List<bool>( new bool[3] { true, false, false });
+            RaisePropertyChanged("PlotVisibility");
+        }
+
+        private void mltPlotButtonClickCommand()
+        {
+            List<Visibility> _PlotVisibility = new List<Visibility>(new Visibility[] { Visibility.Hidden, Visibility.Visible, Visibility.Hidden });
+            Messenger.Default.Send<List<Visibility>>(_PlotVisibility, "PlotVisiblityUpdate");
+            _PlotVisibility.Clear();
+            _PlotVisibility = null;
+
+            PlotVisibility = new List<bool>(new bool[3] { false, true, false });
+            RaisePropertyChanged("PlotVisibility");
+        }
+
+        private void bkPlotButtonClickCommand()
+        {
+            List<Visibility> _PlotVisibility = new List<Visibility>(new Visibility[] { Visibility.Hidden, Visibility.Hidden, Visibility.Visible });
+            Messenger.Default.Send<List<Visibility>>(_PlotVisibility, "PlotVisiblityUpdate");
+            _PlotVisibility.Clear();
+            _PlotVisibility = null;
+
+            PlotVisibility = new List<bool>(new bool[3] { false, false, true });
+            RaisePropertyChanged("PlotVisibility");
+        }
+
+
         // Gets executed before the application shuts down to close the comPort
         private void mainClosing()
         {
@@ -1345,6 +1455,7 @@ namespace LAB.ViewModel
             brewery.HLT.Temp.Value = _brewery.HLT.Temp.Value;
             brewery.MLT.Temp.Value = _brewery.MLT.Temp.Value;
             brewery.BK.Temp.Value = _brewery.BK.Temp.Value;
+       
             if (brewery.AutomationMode != automationMode.Automatic) { return; }
             RunAutoStateMachine();
         }
@@ -1481,11 +1592,60 @@ namespace LAB.ViewModel
             brewery.BK.Temp.SetPointReached = _brewery.BK.Temp.SetPointReached;
         }
 
+        // HLT LastError Update
+        private void HLTPIDUpdate_MessageReceived(Brewery _brewery)
+        {
+            brewery.HLT.Temp.LastError = _brewery.HLT.Temp.LastError;
+            brewery.HLT.Temp.ErrorIntegral = _brewery.HLT.Temp.ErrorIntegral;
+
+            // Add the new error value in the error array for derivation calcultions
+            brewery.HLT.Temp.ErrorDerivative.Add(_brewery.HLT.Temp.LastError);
+
+            // Resize the error array if needed to limit to 100 elements
+            if (brewery.HLT.Temp.ErrorDerivative.Count > hardwareSettings.ErrorDerivativeCount) { brewery.HLT.Temp.ErrorDerivative.RemoveAt(0); }
+        }
+
+        // MLT LastError Update
+        private void MLTPIDUpdate_MessageReceived(Brewery _brewery)
+        {
+            brewery.MLT.Temp.LastError = _brewery.MLT.Temp.LastError;
+            brewery.MLT.Temp.ErrorIntegral = _brewery.MLT.Temp.ErrorIntegral;
+
+            // Add the new error value in the error array for derivation calcultions
+            brewery.MLT.Temp.ErrorDerivative.Add(_brewery.MLT.Temp.LastError);
+
+            // Resize the error array if needed to limit to 100 elements
+            if (brewery.MLT.Temp.ErrorDerivative.Count > hardwareSettings.ErrorDerivativeCount) { brewery.MLT.Temp.ErrorDerivative.RemoveAt(0); }
+        }
+
+        // BK LastError Update
+        private void BKPIDUpdate_MessageReceived(Brewery _brewery)
+        {
+            brewery.BK.Temp.LastError = _brewery.BK.Temp.LastError;
+            brewery.BK.Temp.ErrorIntegral = _brewery.BK.Temp.ErrorIntegral;
+
+            // Add the new error value in the error array for derivation calcultions
+            brewery.BK.Temp.ErrorDerivative.Add(_brewery.BK.Temp.LastError);
+
+            // Resize the error array if needed to limit to 100 elements
+            if (brewery.BK.Temp.ErrorDerivative.Count > hardwareSettings.ErrorDerivativeCount) { brewery.BK.Temp.ErrorDerivative.RemoveAt(0); }
+        }
+
         // Valve Update
         private void ValveUpdate_MessageReceived(Brewery.valve _Valve)
         {
             brewery.Valves[_Valve.Number] = _Valve;
             RaisePropertyChanged("ValveList");
+        }
+
+        // Safe Mode Update
+        private void SafeModeUpdate_MessageReceived( bool _SafeModeState)
+        {
+
+            brewery.SafeModeOn = true;
+            UpdateSensorsTimer.Stop();
+            breweryCommand.PreDisconnect();
+            RunAutoStateMachine();
         }
 
         // DEBUG METHODS
@@ -1524,11 +1684,6 @@ namespace LAB.ViewModel
 
         #endregion
 
-        ////public override void Cleanup()
-        ////{
-        ////    // Clean up if needed
 
-        ////    base.Cleanup();
-        ////}
     }
 }

@@ -294,6 +294,7 @@
                         </i:Interaction.Triggers>
                         </Border>
                     </StackPanel>
+                    
                     <Views:ProcessPlotView Margin="35,0,0,0"/>
                     <Views:UserActionView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="50,0,0,0" Panel.ZIndex="5000" Opacity="0.9"/>
                 </Grid>

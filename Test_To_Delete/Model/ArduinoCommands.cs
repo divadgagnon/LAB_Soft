@@ -116,6 +116,13 @@ namespace LAB
             StartTimeoutTimer();
         }
 
+        public void UpdateSensors(int HLT_Vol_Pin, int BK_Vol_Pin)
+        {
+            byte HLTpinByte = Convert.ToByte(HLT_Vol_Pin);
+            byte BKpinByte = Convert.ToByte(BK_Vol_Pin);
+            device.SendPacketData(new byte[3] { 0x08, HLTpinByte, BKpinByte });
+        }
+
         public void GetProbeAddress()
         {
             device.SendPacketData(new byte[1] { 0x06 });
@@ -182,8 +189,8 @@ namespace LAB
 
                 case 0x03:
                 {
-                        returnDigitalRead(packet);
-                        packet = null;
+                    returnDigitalRead(packet);
+                    packet = null;
                     break;
                 }
 
@@ -215,6 +222,13 @@ namespace LAB
                     break;
                 }
 
+                case 0x08:
+                {
+                    returnSensorsUpdate(packet);
+                    packet = null;
+                    break;
+                }
+
                 default:
                 {
                     // Set StateMachineState = CommError;
@@ -230,7 +244,10 @@ namespace LAB
         // Ping return
         private void returnPing(byte[] packet)
         {
-            if(packet.Count() != 2) { device.Close(); goto MessageError; }
+            // Set the FirstPingSent variable back to false
+            FirstPing = false;
+
+            if (packet.Count() != 2) { device.Close(); goto MessageError; }
 
             if(packet[1] == 0x67)
             {
@@ -248,18 +265,15 @@ namespace LAB
         // Analog Read return
         private void returnAnalogRead(byte[] packet)
         {
-            // Set the FirstPingSent variable back to false
-            FirstPing = false;
+            //// Store data in volSensor class
+            //Error_Timer.Stop();
+            //AnalogReturn volSensor = new AnalogReturn();
+            //volSensor.Pin = packet[1];
+            //volSensor.Value = packet[2];
+            //volSensor.OverByte = packet[3] == 1 ;
 
-            // Store data in volSensor class
-            Error_Timer.Stop();
-            AnalogReturn volSensor = new AnalogReturn();
-            volSensor.Pin = packet[1];
-            volSensor.Value = packet[2];
-            volSensor.OverByte = packet[3] == 1 ;
-
-            // Send volSensor data to brewery command class
-            Messenger.Default.Send<AnalogReturn>(volSensor, "VolumeUpdate");            
+            //// Send volSensor data to brewery command class
+            //Messenger.Default.Send<AnalogReturn>(volSensor, "VolumeUpdate");            
         }
 
         // Digital Read return
@@ -375,6 +389,65 @@ namespace LAB
 
             Messenger.Default.Send<Probes>(probes, "TemperatureUpdate");
         }
- #endregion
+
+        private void returnSensorsUpdate(byte[] Packet)
+        {
+            Error_Timer.Stop();
+            Probes probes = new Probes();
+
+            AnalogReturn HLTVolSensor = new AnalogReturn();
+            HLTVolSensor.Pin = Packet[1];
+            HLTVolSensor.Value = Packet[2];
+            HLTVolSensor.OverByte = Packet[3] == 1;
+
+            AnalogReturn BKVolSensor = new AnalogReturn();
+            BKVolSensor.Pin = Packet[4];
+            BKVolSensor.Value = Packet[5];
+            BKVolSensor.OverByte = Packet[6] == 1;
+
+            int PacketLength = (int)Packet.Count()-1;
+            for (int i =7; i <= PacketLength; i += 2)
+            {
+                switch (Packet[i])
+                {
+                    case 0x9E:
+                        {
+                            //Probe Jaune et Rose
+                            probes.YellowPink.Temp = (double)Packet[i + 1] * 0.46875;
+                            break;
+                        }
+                    case 0x4B:
+                        {
+                            //Probe Jaune et Orange
+                            probes.YellowOrange.Temp = (double)Packet[i + 1] * 0.46875;
+                            break;
+                        }
+                    case 0xA5:
+                        {
+                            //Probe Orange
+                            probes.Orange.Temp = (double)Packet[i + 1] * 0.46875;
+                            break;
+                        }
+                    case 0x4F:
+                        {
+                            //Probe Rose
+                            probes.Pink.Temp = (double)Packet[i + 1] * 0.46875;
+                            break;
+                        }
+                    case 0x26:
+                        {
+                            //Probe Jaune
+                            probes.Yellow.Temp = (double)Packet[i + 1] * 0.46875;
+                            break;
+                        }
+                }
+            }
+
+            Messenger.Default.Send<Probes>(probes, "TemperatureUpdate");
+            Messenger.Default.Send<AnalogReturn>(HLTVolSensor, "VolumeUpdate");
+            Messenger.Default.Send<AnalogReturn>(BKVolSensor, "VolumeUpdate");
+        }
+
+        #endregion
     }
 }

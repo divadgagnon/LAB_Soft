@@ -41,7 +41,8 @@
             </Canvas>
             <Label x:Name="VolumeLabel" Content="{Binding Path=MLT_Volume}" HorizontalAlignment="Center" Margin="0,30,0,0" VerticalAlignment="Center" FontSize="21.333" FontWeight="Bold" Foreground="White"/>
             <Label x:Name="TempLabel" Content="{Binding Path=MLT_Temp}" HorizontalAlignment="Center" Margin="0,-30,0,0" VerticalAlignment="Center" FontSize ="21.333" FontWeight="Bold" Foreground="White"/>
-
+            <Label x:Name="Duty_Cycle_Label" Content="{Binding Path=MLT_Duty_Cycle}" HorizontalAlignment="Center"  Margin="0,90,0,0" VerticalAlignment="Center" FontSize="21.333" FontWeight="Bold" Foreground="White"/>
+            
             <Label x:Name="VesselName" Content="MLT" HorizontalAlignment="Center" FontSize="21.333" FontWeight="Bold" Foreground="White"/>
             <Path Stretch="Fill" StrokeLineJoin="Round" Stroke="#FF000000" Fill="#FF474646" Data="F1 M 14.375,3.93754L 137.5,3.93754C 139.157,3.93754 140.5,5.28068 140.5,6.93754L 140.5,12.6875C 140.5,14.3444 139.157,15.6875 137.5,15.6875L 14.375,15.6875C 12.7181,15.6875 11.375,14.3444 11.375,12.6875L 11.375,6.93754C 11.375,5.28068 12.7181,3.93754 14.375,3.93754 Z " Width="130" Height="15" VerticalAlignment="Bottom" HorizontalAlignment="Center" StrokeThickness="2" Margin="0,0,0,7">
                 <i:Interaction.Triggers>

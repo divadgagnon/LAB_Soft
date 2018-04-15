@@ -1,4 +1,6 @@
-  // Include libraries
+// LAB_V2 FIRMWARE Version 5.2
+  
+// Include libraries
   #include <Wire.h>
   #include <OneWire.h>
   #include <DallasTemperature.h>
@@ -24,7 +26,7 @@
        // Search the wire for address
        if(sensors.getAddress(TempAddress, i))
        {
-  	sensors.setResolution(TempAddress, TEMPERATURE_PRECISION);
+  			sensors.setResolution(TempAddress, TEMPERATURE_PRECISION);
        }
      }  
   }
@@ -43,7 +45,7 @@
     
     if (Serial.available()>0)
     {
-      delay(100);
+      delay(50);
       // Look for start of command Byte
       if (Serial.read()==0x55)
       {
@@ -170,7 +172,7 @@
       //
       case 0x05:
       {
-        int Val = analogRead(Inbyte[1])/2;
+        int Val = analogRead(Inbyte[1]);
 		bool Over = Val > 255;
 
 		if (Over)
@@ -233,6 +235,59 @@
          SendPacket(OutBuffer, sizeof(OutBuffer));
          break;
       }
+
+	case 0x08:
+	{
+		// Get Temparatures from all the DS1820B on the bus
+		sensors.requestTemperatures();
+        delay(50);
+		byte OutBuffer[NumberOfDevices*2+7];
+		OutBuffer[0] = 0x08
+
+		// Get the analog pressure data from HLT
+		int ValHLT = analogRead(Inbyte[1]);
+		bool OverHLT = Val¸HLT > 255;
+
+		if (Over)
+		{
+			ValHLT = ValHLT - 255;
+		}
+
+        OutBuffer[1] = Inbyte[1];
+		OutBuffer[2] = ValHLT;
+		OutBuffer[3] = OverHLT;
+
+		// Get the analog pressure data from BK
+		int ValBK = analogRead(Inbyte[2]);
+		bool OverBK = ValBK > 255;
+
+		if (Over)
+		{
+			ValBK = ValBK - 255;
+		}
+
+		OutBuffer[4] = Inbyte[2];
+        OutBuffer[5] = ValBK;
+		OutBuffer[6] = OverBK;
+
+		// Package Temperature Data        
+		int j = 0;
+        
+        for(int i=6;i<NumberOfDevices*2+6; i+=2)
+        {
+            // Search the wire for address
+            if(sensors.getAddress(TempAddress, j))
+   			{
+               byte TempData = round(sensors.getTempC(TempAddress)/0.46875);
+               OutBuffer[i+1] = TempAddress[7];
+               OutBuffer[i+2] = TempData;
+			   j+=1;
+            }
+         }	
+
+		 SendPacket(OutBuffer, sizeof(OutBuffer));
+         break;
+	}
     }
     
     // ------------- Maintenance -------------

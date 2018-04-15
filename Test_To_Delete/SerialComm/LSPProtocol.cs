@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using GalaSoft.MvvmLight.Messaging;
 using System.IO.Ports;
+using LAB.Model;
 using SerialComm.PacketEncoder.Interfaces;
 using SerialComm.SerialPortData;
 using SerialComm.PacketEncoder;
@@ -86,18 +88,19 @@ namespace SerialComm
   /// <param name="settings">Settings of the port.</param>
   public void Open(string portName,SerialPortSettings settings)
   {
-   if(m_serialPort!=null)
-   {
-    throw new InvalidOperationException("The LSP Protocol object couldn't open a serial port, since it already had a serial port open.");
-   }
+        if(m_serialPort!=null)
+            { 
+                Messenger.Default.Send(true, "SafeModeUpdate");
+                System.Windows.MessageBox.Show("The LSP Protocol object couldn't open a serial port, since it already had a serial port open.");
+            }
 
-   m_serialPort=new SerialPort(portName,settings.BaudRate,settings.Parity,settings.DataBits,settings.StopBits);
-   if(!m_serialPort.IsOpen)
-   {
-    m_serialPort.Open();
-   }
-   m_serialPort.DataReceived+=new SerialDataReceivedEventHandler(DataReceivedHandler);
-   m_encoder.Reset();
+        m_serialPort=new SerialPort(portName,settings.BaudRate,settings.Parity,settings.DataBits,settings.StopBits);
+        if(!m_serialPort.IsOpen)
+        {
+            m_serialPort.Open();
+        }
+        m_serialPort.DataReceived+=new SerialDataReceivedEventHandler(DataReceivedHandler);
+        m_encoder.Reset();
   }
 
   /// <summary>
@@ -106,12 +109,12 @@ namespace SerialComm
   /// <returns>The oldest received packet's payload or null if none was received.</returns>
   public byte[] ReceivePacketData()
   {
-   if(m_rxQueue.Count>0)
-   {
-    return m_rxQueue.Dequeue();
-   }
+        if(m_rxQueue.Count>0)
+        {
+            return m_rxQueue.Dequeue();
+        }
 
-   return default(byte[]);
+        return default(byte[]);
   }
 
   /// <summary>
@@ -120,22 +123,31 @@ namespace SerialComm
   /// <param name="packetData">Data to be sent as a packet on the serial port.</param>
   public void SendPacketData(byte[] packetData)
   {
-   if(m_serialPort==null)
-   {
-    throw new InvalidOperationException("Couldn't send data on serial port, since it wasn't open.");
-   }
+            try
+            {
+                if (m_serialPort == null)
+                {
+                    Messenger.Default.Send(true, "SafeModeUpdate");
+                    System.Windows.MessageBox.Show("Serial port is not open or available. Couldn't sent serial data. Reconnect the brewery and resume");
+                }
 
-   m_encoder.SendPacket(packetData);
-   byte[] buffer=new byte[256];
-   int count;
+                m_encoder.SendPacket(packetData);
+                byte[] buffer = new byte[256];
+                int count;
 
-   do
-   {
-    count=m_encoder.Read(buffer,0,256);
-    m_serialPort.Write(buffer,0,count);
-   }
-   while(count>0);
-  }
+                do
+                {
+                    count = m_encoder.Read(buffer, 0, 256);
+                    m_serialPort.Write(buffer, 0, count);
+                }
+                while (count > 0);
+            }
+            catch
+            {
+                Messenger.Default.Send(true, "SafeModeUpdate");
+                System.Windows.MessageBox.Show("An error occured while trying to send data to the serial port. Try to reconnect the brewery and resume");
+            }
+}
 
   #endregion
 

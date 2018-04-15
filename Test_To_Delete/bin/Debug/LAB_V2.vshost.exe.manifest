@@ -78,14 +78,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="LAB_V2.exe" size="401832">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="LAB_V2.exe" size="409088">
       <assemblyIdentity name="LAB_V2" version="0.0.0.1" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>FhBIVxrICpMOLcTwi3IeIFEmijWWEwOauDajB97XnmM=</dsig:DigestValue>
+        <dsig:DigestValue>oD6HnJ3L6ZYkFaTgYKBp/KKMe9/FZk9RZV4j3vDJXUc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

@@ -22,6 +22,8 @@ namespace LAB.ViewModel
         public const string WaterHeightSetPointPropertyName = "WaterHeightSetPoint";
         public const string HLT_VolumePropertyName = "HLT_Volume";
         public const string HLT_TempPropertyName = "HLT_Temp";
+        public const string HLT_Duty_CyclePropertyName = "HLT_Duty_Cycle";
+        public const string HLT_ErrorsPropertyName = "HLT_Errors";
         public const string HLT_Volume_SetPointPropertyName = "HLT_Volume_SetPoint";
         public const string HLT_SetPoint_Label_VisibilityPropertyName = "HLT_SetPoint_Visibility";
         public const string Thermo_HeightPropertyName = "Thermo_Height";
@@ -140,6 +142,14 @@ namespace LAB.ViewModel
             }
         }
 
+        public string HLT_Duty_Cycle
+        {
+            get
+            {
+                return "Duty Cycle : " + Math.Round(brewery.HLT.Burner.DutyCycle * 100, 2) + " %";
+            }
+        }
+
         public HLTViewModel()
         {
             // Create new instances of model classes
@@ -188,10 +198,12 @@ namespace LAB.ViewModel
             // Update the Volume
             if(_brewery.HLT.Volume.Value == 500) { return; }
             brewery.HLT.Volume.Value = _brewery.HLT.Volume.Value;
+            brewery.HLT.Burner.DutyCycle = _brewery.HLT.Burner.DutyCycle;
 
             // Raise the volume related properties changed event
             RaisePropertyChanged(HLT_VolumePropertyName);
             RaisePropertyChanged(WaterHeightPropertyName);
+            RaisePropertyChanged(HLT_Duty_CyclePropertyName);
         }
 
         // HLT Burner Update

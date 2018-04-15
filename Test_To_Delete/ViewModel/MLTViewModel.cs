@@ -25,6 +25,7 @@ namespace LAB.ViewModel
         public const string WaterHeightSetPointPropertyName = "WaterHeightSetPoint";
         public const string MLT_VolumePropertyName = "MLT_Volume";
         public const string MLT_TempPropertyName = "MLT_Temp";
+        public const string MLT_Duty_CyclePropertyName = "MLT_Duty_Cycle";
         public const string MLT_Volume_SetPointPropertyName = "MLT_Volume_SetPoint";
         public const string MLT_SetPoint_Label_VisibilityPropertyName = "MLT_SetPoint_Visibility";
         public const string Thermo_HeightPropertyName = "Thermo_Height";
@@ -143,6 +144,15 @@ namespace LAB.ViewModel
             }
         }
 
+        // Burner DutyCycle
+        public string MLT_Duty_Cycle
+        {
+            get
+            {
+                return "Duty Cycle : " + Math.Round(brewery.MLT.Burner.DutyCycle * 100, 2) + " %";
+            }
+        }
+
         #endregion
 
         public MLTViewModel()
@@ -182,10 +192,12 @@ namespace LAB.ViewModel
         {
             // Update the Volume
             brewery.MLT.Volume.Value = _brewery.MLT.Volume.Value;
+            brewery.MLT.Burner.DutyCycle = _brewery.MLT.Burner.DutyCycle;
 
             // Raise the volume related properties changed event
             RaisePropertyChanged(MLT_VolumePropertyName);
             RaisePropertyChanged(WaterHeightPropertyName);
+            RaisePropertyChanged(MLT_Duty_CyclePropertyName);
         }
 
         // MLT Burner Update
